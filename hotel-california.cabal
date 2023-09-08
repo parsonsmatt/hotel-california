@@ -32,15 +32,46 @@ library
   hs-source-dirs:
       src
   default-extensions:
-      DeriveGeneric
-      TypeOperators
-      OverloadedStrings
+      BlockArguments
       DataKinds
+      DefaultSignatures
+      DeriveFunctor
+      DeriveGeneric
+      DeriveLift
+      DerivingStrategies
+      DerivingVia
+      FlexibleContexts
+      FlexibleInstances
+      GADTs
+      GeneralizedNewtypeDeriving
+      ImportQualifiedPost
+      InstanceSigs
+      LambdaCase
+      MultiParamTypeClasses
+      MultiWayIf
+      NamedFieldPuns
+      NegativeLiterals
+      NumericUnderscores
+      OverloadedLabels
+      OverloadedStrings
+      PartialTypeSignatures
+      PatternSynonyms
+      RankNTypes
       RecordWildCards
+      ScopedTypeVariables
+      StandaloneDeriving
+      TypeApplications
+      TypeFamilies
+      UndecidableInstances
+      ViewPatterns
+      OverloadedRecordDot
+      TypeOperators
+      StrictData
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded
   build-depends:
       base >=4.7 && <5
-    , hs-opentelemetry-api >=0.0.3.6
+    , bytestring
+    , hs-opentelemetry-api >=0.0.3.8
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
     , hs-opentelemetry-sdk >=0.0.3.3
@@ -48,7 +79,9 @@ library
     , hs-opentelemetry-vendor-honeycomb
     , optparse-applicative
     , text
+    , time
     , typed-process
+    , unliftio
   default-language: Haskell2010
 
 executable hotel
@@ -58,16 +91,47 @@ executable hotel
   hs-source-dirs:
       app
   default-extensions:
-      DeriveGeneric
-      TypeOperators
-      OverloadedStrings
+      BlockArguments
       DataKinds
+      DefaultSignatures
+      DeriveFunctor
+      DeriveGeneric
+      DeriveLift
+      DerivingStrategies
+      DerivingVia
+      FlexibleContexts
+      FlexibleInstances
+      GADTs
+      GeneralizedNewtypeDeriving
+      ImportQualifiedPost
+      InstanceSigs
+      LambdaCase
+      MultiParamTypeClasses
+      MultiWayIf
+      NamedFieldPuns
+      NegativeLiterals
+      NumericUnderscores
+      OverloadedLabels
+      OverloadedStrings
+      PartialTypeSignatures
+      PatternSynonyms
+      RankNTypes
       RecordWildCards
+      ScopedTypeVariables
+      StandaloneDeriving
+      TypeApplications
+      TypeFamilies
+      UndecidableInstances
+      ViewPatterns
+      OverloadedRecordDot
+      TypeOperators
+      StrictData
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
     , hotel-california
-    , hs-opentelemetry-api >=0.0.3.6
+    , hs-opentelemetry-api >=0.0.3.8
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
     , hs-opentelemetry-sdk >=0.0.3.3
@@ -75,7 +139,9 @@ executable hotel
     , hs-opentelemetry-vendor-honeycomb
     , optparse-applicative
     , text
+    , time
     , typed-process
+    , unliftio
   default-language: Haskell2010
 
 test-suite hotel-california-test
@@ -86,16 +152,47 @@ test-suite hotel-california-test
   hs-source-dirs:
       test
   default-extensions:
-      DeriveGeneric
-      TypeOperators
-      OverloadedStrings
+      BlockArguments
       DataKinds
+      DefaultSignatures
+      DeriveFunctor
+      DeriveGeneric
+      DeriveLift
+      DerivingStrategies
+      DerivingVia
+      FlexibleContexts
+      FlexibleInstances
+      GADTs
+      GeneralizedNewtypeDeriving
+      ImportQualifiedPost
+      InstanceSigs
+      LambdaCase
+      MultiParamTypeClasses
+      MultiWayIf
+      NamedFieldPuns
+      NegativeLiterals
+      NumericUnderscores
+      OverloadedLabels
+      OverloadedStrings
+      PartialTypeSignatures
+      PatternSynonyms
+      RankNTypes
       RecordWildCards
+      ScopedTypeVariables
+      StandaloneDeriving
+      TypeApplications
+      TypeFamilies
+      UndecidableInstances
+      ViewPatterns
+      OverloadedRecordDot
+      TypeOperators
+      StrictData
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring
     , hotel-california
-    , hs-opentelemetry-api >=0.0.3.6
+    , hs-opentelemetry-api >=0.0.3.8
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
     , hs-opentelemetry-sdk >=0.0.3.3
@@ -103,5 +200,7 @@ test-suite hotel-california-test
     , hs-opentelemetry-vendor-honeycomb
     , optparse-applicative
     , text
+    , time
     , typed-process
+    , unliftio
   default-language: Haskell2010

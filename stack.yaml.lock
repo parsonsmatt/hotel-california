@@ -19,13 +19,6 @@ packages:
   original:
     hackage: hs-opentelemetry-api-0.0.3.8
 - completed:
-    hackage: hs-opentelemetry-exporter-otlp-0.0.1.4@sha256:25fcf5c2173f1dd3fe4f288f3232da70e9d8398363430932b7e2a278f78c3765,2150
-    pantry-tree:
-      sha256: 6d2ae7125938614e10d01b317d10bfd4575bb62889360c4476dda2b904766cda
-      size: 400
-  original:
-    hackage: hs-opentelemetry-exporter-otlp-0.0.1.4
-- completed:
     hackage: hs-opentelemetry-otlp-0.0.1.0@sha256:88bb6b68f172a336f78018b0823f47363fb7408eb19f7301489f81ad4d5c0f33,2307
     pantry-tree:
       sha256: e56292fc693805babed3c7ba7fc54e59d2e9adbc38de6bcc659009e8b10b9a1b
@@ -81,6 +74,19 @@ packages:
       size: 400
   original:
     hackage: thread-utils-finalizers-0.1.0.0
+- completed:
+    name: hs-opentelemetry-exporter-otlp
+    pantry-tree:
+      sha256: 6ca58760af59fe7dacc5cbf642a461de0367aaed1f5d1a92754a5b27acc88950
+      size: 502
+    sha256: 8a8d8d08252747c6abe1a2c9f9d14b0fa6ccb5903faa290124d18a2e3690f411
+    size: 361699
+    subdir: exporters/otlp
+    url: https://github.com/parsonsmatt/hs-opentelemetry/archive/da04eede49e659fde15ce8382e9294a6d6732930.tar.gz
+    version: 0.0.1.5
+  original:
+    subdir: exporters/otlp
+    url: https://github.com/parsonsmatt/hs-opentelemetry/archive/da04eede49e659fde15ce8382e9294a6d6732930.tar.gz
 snapshots:
 - completed:
     sha256: 2fc12a405ab6f7eac73eb11a0ca5ccca0e956bd2848db780c140b7406ff9ebb5

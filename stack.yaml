@@ -7,7 +7,7 @@ packages:
 extra-deps:
   - honeycomb-0.1.0.1
   - hs-opentelemetry-api-0.0.3.8
-  - hs-opentelemetry-exporter-otlp-0.0.1.4
+    # - hs-opentelemetry-exporter-otlp-0.0.1.4
   - hs-opentelemetry-otlp-0.0.1.0
   - hs-opentelemetry-propagator-b3-0.0.1.0
   - hs-opentelemetry-propagator-w3c-0.0.1.2
@@ -16,3 +16,7 @@ extra-deps:
   - hs-opentelemetry-vendor-honeycomb-0.0.1.1
   - thread-utils-context-0.3.0.3
   - thread-utils-finalizers-0.1.0.0
+  - github: parsonsmatt/hs-opentelemetry
+    commit: da04eede49e659fde15ce8382e9294a6d6732930
+    subdirs:
+      - exporters/otlp

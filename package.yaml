@@ -21,7 +21,8 @@ description:         Please see the README on GitHub at <https://github.com/pars
 
 dependencies:
 - base >= 4.7 && < 5
-- hs-opentelemetry-api >= 0.0.3.6
+- bytestring
+- hs-opentelemetry-api >= 0.0.3.8
 - hs-opentelemetry-exporter-otlp
 - hs-opentelemetry-propagator-w3c
 - hs-opentelemetry-sdk >= 0.0.3.3
@@ -29,14 +30,46 @@ dependencies:
 - hs-opentelemetry-vendor-honeycomb
 - optparse-applicative
 - text
+- time
 - typed-process
+- unliftio
 
 default-extensions:
-  - DeriveGeneric
-  - TypeOperators
-  - OverloadedStrings
-  - DataKinds
-  - RecordWildCards
+- BlockArguments
+- DataKinds
+- DefaultSignatures
+- DeriveFunctor
+- DeriveGeneric
+- DeriveLift
+- DerivingStrategies
+- DerivingVia
+- FlexibleContexts
+- FlexibleInstances
+- GADTs
+- GeneralizedNewtypeDeriving
+- ImportQualifiedPost
+- InstanceSigs
+- LambdaCase
+- MultiParamTypeClasses
+- MultiWayIf
+- NamedFieldPuns
+- NegativeLiterals
+- NumericUnderscores
+- OverloadedLabels
+- OverloadedStrings
+- PartialTypeSignatures
+- PatternSynonyms
+- RankNTypes
+- RecordWildCards
+- ScopedTypeVariables
+- StandaloneDeriving
+- TypeApplications
+- TypeFamilies
+- UndecidableInstances
+- ViewPatterns
+- OverloadedRecordDot
+- TypeOperators
+- StrictData
 
 ghc-options:
 - -Wall

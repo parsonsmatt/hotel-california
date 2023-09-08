@@ -1,5 +1,5 @@
 name:                hotel-california
-version:             0.1.0.0
+version:             0.0.1.0
 github:              "parsonsmatt/hotel-california"
 license:             BSD3
 author:              Matt Parsons
@@ -21,6 +21,12 @@ description:         Please see the README on GitHub at <https://github.com/pars
 
 dependencies:
 - base >= 4.7 && < 5
+- hs-opentelemetry-api >= 0.0.3.6
+- hs-opentelemetry-exporter-otlp
+- hs-opentelemetry-propagator-w3c
+- hs-opentelemetry-sdk >= 0.0.3.3
+- hs-opentelemetry-vendor-honeycomb
+- hs-opentelemetry-utils-exceptions
 
 ghc-options:
 - -Wall

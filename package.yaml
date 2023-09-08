@@ -25,8 +25,18 @@ dependencies:
 - hs-opentelemetry-exporter-otlp
 - hs-opentelemetry-propagator-w3c
 - hs-opentelemetry-sdk >= 0.0.3.3
-- hs-opentelemetry-vendor-honeycomb
 - hs-opentelemetry-utils-exceptions
+- hs-opentelemetry-vendor-honeycomb
+- optparse-applicative
+- text
+- typed-process
+
+default-extensions:
+  - DeriveGeneric
+  - TypeOperators
+  - OverloadedStrings
+  - DataKinds
+  - RecordWildCards
 
 ghc-options:
 - -Wall
@@ -38,6 +48,7 @@ ghc-options:
 - -Wmissing-home-modules
 - -Wpartial-fields
 - -Wredundant-constraints
+- -threaded
 
 library:
   source-dirs: src

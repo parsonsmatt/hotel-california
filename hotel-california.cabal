@@ -27,6 +27,7 @@ library
   exposed-modules:
       HotelCalifornia
       HotelCalifornia.Exec
+      HotelCalifornia.Tracing
   other-modules:
       Paths_hotel_california
   hs-source-dirs:
@@ -67,7 +68,8 @@ library
       OverloadedRecordDot
       TypeOperators
       StrictData
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded
+      ApplicativeDo
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded
   build-depends:
       base >=4.7 && <5
     , bytestring
@@ -126,7 +128,8 @@ executable hotel
       OverloadedRecordDot
       TypeOperators
       StrictData
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -threaded -rtsopts -with-rtsopts=-N
+      ApplicativeDo
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , bytestring
@@ -187,7 +190,8 @@ test-suite hotel-california-test
       OverloadedRecordDot
       TypeOperators
       StrictData
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -threaded -rtsopts -with-rtsopts=-N
+      ApplicativeDo
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , bytestring

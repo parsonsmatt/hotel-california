@@ -70,6 +70,7 @@ default-extensions:
 - OverloadedRecordDot
 - TypeOperators
 - StrictData
+- ApplicativeDo
 
 ghc-options:
 - -Wall
@@ -77,7 +78,6 @@ ghc-options:
 - -Widentities
 - -Wincomplete-record-updates
 - -Wincomplete-uni-patterns
-- -Wmissing-export-lists
 - -Wmissing-home-modules
 - -Wpartial-fields
 - -Wredundant-constraints

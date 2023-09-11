@@ -39,9 +39,10 @@ runExecArgs ExecArgs {..} = do
         spanName =
             fromMaybe (Text.pack script) execArgsSpanName
 
-    -- print ("args: ", execArgsScript)
-    exitCode <-
-        inSpan spanName do
-            runProcess $ shell $ unwords $ NEL.toList execArgsScript
-    -- print ("exit code: ", exitCode)
-    exitWith exitCode
+    inSpan spanName do
+        exitCode <- runProcess $ shell $ unwords $ NEL.toList execArgsScript
+        case exitCode of
+            ExitSuccess ->
+                pure ()
+            _ ->
+                exitWith exitCode

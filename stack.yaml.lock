@@ -3,7 +3,90 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: honeycomb-0.1.0.1@sha256:255820a584335bf3474d8d7f604c0089c92f895c21e3b2b5f4131b7429e3dde6,2748
+    pantry-tree:
+      sha256: b8b779bd3bf53fbbc0bdfc6c7239256a0b1b4bf4f652cc5967ab35a207b65941
+      size: 1454
+  original:
+    hackage: honeycomb-0.1.0.1
+- completed:
+    hackage: hs-opentelemetry-api-0.0.3.8@sha256:ac02b4e6873962eb0eab665666197013291e3435fb10280f8c7c8f1e66bbae47,3593
+    pantry-tree:
+      sha256: 6f5674d48e1ffdef81fb93604c52236e835232b3b843c903d9649c838a13e3a9
+      size: 2986
+  original:
+    hackage: hs-opentelemetry-api-0.0.3.8
+- completed:
+    hackage: hs-opentelemetry-otlp-0.0.1.0@sha256:88bb6b68f172a336f78018b0823f47363fb7408eb19f7301489f81ad4d5c0f33,2307
+    pantry-tree:
+      sha256: e56292fc693805babed3c7ba7fc54e59d2e9adbc38de6bcc659009e8b10b9a1b
+      size: 2252
+  original:
+    hackage: hs-opentelemetry-otlp-0.0.1.0
+- completed:
+    hackage: hs-opentelemetry-propagator-b3-0.0.1.0@sha256:d398075410eadb00723463d580e9756d8d61a44e35dcf2510feb71756f07c04f,1842
+    pantry-tree:
+      sha256: 7b6b0cc74ab1bab3b790114b3a0f01c58dde1807169376df6c1323ec4883550e
+      size: 482
+  original:
+    hackage: hs-opentelemetry-propagator-b3-0.0.1.0
+- completed:
+    hackage: hs-opentelemetry-propagator-w3c-0.0.1.2@sha256:ba1e33ff73bec76ec53b049b0cb3d1a65a6849a60c0da08bbef308f0edc241d1,1751
+    pantry-tree:
+      sha256: 3f3a81317fe511bf11191d6ea186d7c98c7fd794b32cc358606ee681637b2a0e
+      size: 496
+  original:
+    hackage: hs-opentelemetry-propagator-w3c-0.0.1.2
+- completed:
+    hackage: hs-opentelemetry-sdk-0.0.3.5@sha256:2be6d10da0ba0ad38986d75037d008e819f5fa190324dbd0cd12be9fd16dd1cf,3806
+    pantry-tree:
+      sha256: b9598c72b7558dc10c6d5126c9344d6029f6091f1258497c92e0eff26b577f54
+      size: 1430
+  original:
+    hackage: hs-opentelemetry-sdk-0.0.3.5
+- completed:
+    hackage: hs-opentelemetry-utils-exceptions-0.1.0.0@sha256:b021b9912b2d866ac67912d34597cc47d4b39cbe00f83616701ed8474c3219a8,1502
+    pantry-tree:
+      sha256: 1c6454b5ff2a297acd973eb0bb705d1e0c9fb7056215aae71ee57b470afdc6b9
+      size: 405
+  original:
+    hackage: hs-opentelemetry-utils-exceptions-0.1.0.0
+- completed:
+    hackage: hs-opentelemetry-vendor-honeycomb-0.0.1.1@sha256:f814005a02f50259c7003d9bee6f82b012da73e1b5b183ab78036015db558a5b,2724
+    pantry-tree:
+      sha256: ab2c9d0d50127ac454aba93fbf1e392e37ef582a83f6440cf36d50ee6153cc03
+      size: 494
+  original:
+    hackage: hs-opentelemetry-vendor-honeycomb-0.0.1.1
+- completed:
+    hackage: thread-utils-context-0.3.0.3@sha256:8ca2ee2b09ce3a17b1b8dff8a440b47badefc9418c22b16383f13127c2852ec8,1671
+    pantry-tree:
+      sha256: 2683cb1443943c9a1159f959092228e91bc1c62678a384652c82d95b955e690a
+      size: 397
+  original:
+    hackage: thread-utils-context-0.3.0.3
+- completed:
+    hackage: thread-utils-finalizers-0.1.0.0@sha256:a8435240bfc0ae96c94704d2986699a11a395c496f9a7f2e5f5d729a0b967549,1381
+    pantry-tree:
+      sha256: 7f708d158d5d0e32ffe77f6375a792ceb6f92e4d8dd8b32fc69e7de962e7e518
+      size: 400
+  original:
+    hackage: thread-utils-finalizers-0.1.0.0
+- completed:
+    name: hs-opentelemetry-exporter-otlp
+    pantry-tree:
+      sha256: 6ca58760af59fe7dacc5cbf642a461de0367aaed1f5d1a92754a5b27acc88950
+      size: 502
+    sha256: 8a8d8d08252747c6abe1a2c9f9d14b0fa6ccb5903faa290124d18a2e3690f411
+    size: 361699
+    subdir: exporters/otlp
+    url: https://github.com/parsonsmatt/hs-opentelemetry/archive/da04eede49e659fde15ce8382e9294a6d6732930.tar.gz
+    version: 0.0.1.5
+  original:
+    subdir: exporters/otlp
+    url: https://github.com/parsonsmatt/hs-opentelemetry/archive/da04eede49e659fde15ce8382e9294a6d6732930.tar.gz
 snapshots:
 - completed:
     sha256: 2fc12a405ab6f7eac73eb11a0ca5ccca0e956bd2848db780c140b7406ff9ebb5

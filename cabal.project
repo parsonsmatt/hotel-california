@@ -2,7 +2,6 @@ source-repository-package
     type: git
     location: https://github.com/parsonsmatt/hs-opentelemetry
     tag: da04eede49e659fde15ce8382e9294a6d6732930
-    subdir:
-      exporters/otlp
+    subdir: exporters/otlp
 
 packages: .

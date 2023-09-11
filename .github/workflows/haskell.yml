@@ -63,11 +63,3 @@ jobs:
 
       - name: Run tests
         run: cabal test all
-
-          # lmao no thanks
-          # - name: Check cabal file
-          #   run: cabal check
-
-      - name: Build documentation
-        run: cabal haddock all
-

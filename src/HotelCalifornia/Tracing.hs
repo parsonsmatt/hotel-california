@@ -7,7 +7,6 @@ import Control.Monad
 import qualified Data.ByteString.Char8 as BS8
 import Data.Text (Text)
 import Data.Time
-import GHC.Stack
 import HotelCalifornia.Tracing.TraceParent
 import OpenTelemetry.Context as Context hiding (lookup)
 import OpenTelemetry.Context.ThreadLocal (attachContext)
@@ -59,21 +58,22 @@ initializeTracing = do
   setGlobalTracerProvider provider
   pure provider
 
-
 globalTracer :: MonadIO m => m Tracer
 globalTracer = getGlobalTracerProvider >>= \tp -> pure $ makeTracer tp "hotel-california" tracerOptions
 
-inSpan' :: (MonadUnliftIO m, HasCallStack) => Text -> (Span -> m a) -> m a
-inSpan' spanName action = do
-    tr <- globalTracer
-    Trace.inSpan'' tr spanName defaultSpanArguments action
+inSpan' :: (MonadUnliftIO m) => Text -> (Span -> m a) -> m a
+inSpan' spanName =
+    inSpanWith' spanName defaultSpanArguments
 
-inSpanWith :: (MonadUnliftIO m, HasCallStack) => Text -> SpanArguments -> m a -> m a
-inSpanWith spanName args action = do
-    tr <- globalTracer
-    Trace.inSpan'' tr spanName args \_ -> action
+inSpanWith :: (MonadUnliftIO m) => Text -> SpanArguments -> m a -> m a
+inSpanWith spanName args action =
+    inSpanWith' spanName args \_ -> action
 
-inSpan :: (MonadUnliftIO m, HasCallStack) => Text -> m a -> m a
-inSpan spanName action = do
+inSpanWith' :: (MonadUnliftIO m) => Text -> SpanArguments -> (Span -> m a) -> m a
+inSpanWith' spanName args action = do
     tr <- globalTracer
-    Trace.inSpan'' tr spanName defaultSpanArguments \_ -> action
+    Trace.inSpan'' tr spanName args action
+
+inSpan :: (MonadUnliftIO m) => Text -> m a -> m a
+inSpan spanName =
+    inSpanWith spanName defaultSpanArguments

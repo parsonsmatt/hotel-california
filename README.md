@@ -6,10 +6,19 @@ We needed something like this in order to instrument local builds, so we could u
 # Usage
 
 The binary name is `hotel`.
+Currently, the only supported command is `exec`
 
 ```sh
-$ hotel exec -- 
+$ hotel exec -- help
+Usage: hotel exec [-s|--span-name SPAN_NAME] SCRIPT [SCRIPT...]
+
+  Execute the given command with tracing enabled
+
+Available options:
+  -h,--help                Show this help text
 ```
+
+
 
 # Background/FAQ
 

@@ -26,8 +26,9 @@ parseExecArgs = do
             [ metavar "SPAN_NAME"
             , long "span-name"
             , short 's'
+            , help "The name of the span that the program reports. By default, this is the script you pass in."
             ]
-    execArgsScript1 <- argument str (metavar "SCRIPT")
+    execArgsScript1 <- argument str (metavar "SCRIPT" <> help "The command to run, along with any arguments. Best to use -- before providing the script, otherwise it may pass arguments to `hotel` instead of to your script")
     execArgsScriptRest <- many $ argument str (metavar "SCRIPT...")
     pure ExecArgs
         { execArgsScript = execArgsScript1 :| execArgsScriptRest

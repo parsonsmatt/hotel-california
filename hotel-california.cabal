@@ -28,6 +28,7 @@ library
       HotelCalifornia
       HotelCalifornia.Exec
       HotelCalifornia.Tracing
+      HotelCalifornia.Tracing.TraceParent
   other-modules:
       Paths_hotel_california
   hs-source-dirs:
@@ -73,12 +74,13 @@ library
   build-depends:
       base >=4.7 && <5
     , bytestring
-    , hs-opentelemetry-api >=0.0.3.8
+    , hs-opentelemetry-api >=0.1.0.0
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
-    , hs-opentelemetry-sdk >=0.0.3.3
+    , hs-opentelemetry-sdk >=0.0.3.6
     , hs-opentelemetry-utils-exceptions
     , hs-opentelemetry-vendor-honeycomb
+    , http-types
     , optparse-applicative
     , text
     , time
@@ -134,12 +136,13 @@ executable hotel
       base >=4.7 && <5
     , bytestring
     , hotel-california
-    , hs-opentelemetry-api >=0.0.3.8
+    , hs-opentelemetry-api >=0.1.0.0
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
-    , hs-opentelemetry-sdk >=0.0.3.3
+    , hs-opentelemetry-sdk >=0.0.3.6
     , hs-opentelemetry-utils-exceptions
     , hs-opentelemetry-vendor-honeycomb
+    , http-types
     , optparse-applicative
     , text
     , time
@@ -196,12 +199,13 @@ test-suite hotel-california-test
       base >=4.7 && <5
     , bytestring
     , hotel-california
-    , hs-opentelemetry-api >=0.0.3.8
+    , hs-opentelemetry-api >=0.1.0.0
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
-    , hs-opentelemetry-sdk >=0.0.3.3
+    , hs-opentelemetry-sdk >=0.0.3.6
     , hs-opentelemetry-utils-exceptions
     , hs-opentelemetry-vendor-honeycomb
+    , http-types
     , optparse-applicative
     , text
     , time

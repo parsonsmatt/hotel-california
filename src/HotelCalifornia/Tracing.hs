@@ -8,6 +8,7 @@ import qualified Data.ByteString.Char8 as BS8
 import Data.Text (Text)
 import Data.Time
 import GHC.Stack
+import HotelCalifornia.Tracing.TraceParent
 import OpenTelemetry.Context as Context hiding (lookup)
 import OpenTelemetry.Context.ThreadLocal (attachContext)
 import OpenTelemetry.Trace hiding
@@ -32,6 +33,7 @@ import UnliftIO
 withGlobalTracing :: MonadUnliftIO m => m a -> m a
 withGlobalTracing act = do
     void $ attachContext Context.empty
+    liftIO setParentSpanFromEnvironment
     bracket initializeTracing shutdownTracerProvider $ \_ -> do
         -- note: this is not in a span since we don't have a root span yet so it
         -- would not wind up in the trace in a helpful way anyway
@@ -61,8 +63,17 @@ initializeTracing = do
 globalTracer :: MonadIO m => m Tracer
 globalTracer = getGlobalTracerProvider >>= \tp -> pure $ makeTracer tp "hotel-california" tracerOptions
 
+inSpan' :: (MonadUnliftIO m, HasCallStack) => Text -> (Span -> m a) -> m a
+inSpan' spanName action = do
+    tr <- globalTracer
+    Trace.inSpan'' tr spanName defaultSpanArguments action
+
 inSpanWith :: (MonadUnliftIO m, HasCallStack) => Text -> SpanArguments -> m a -> m a
-inSpanWith t a m = globalTracer >>= \tr -> Trace.inSpan tr t a m
+inSpanWith spanName args action = do
+    tr <- globalTracer
+    Trace.inSpan'' tr spanName args \_ -> action
 
 inSpan :: (MonadUnliftIO m, HasCallStack) => Text -> m a -> m a
-inSpan t = inSpanWith t defaultSpanArguments
+inSpan spanName action = do
+    tr <- globalTracer
+    Trace.inSpan'' tr spanName defaultSpanArguments \_ -> action

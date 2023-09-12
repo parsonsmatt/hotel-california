@@ -8,6 +8,8 @@ import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import HotelCalifornia.Tracing
+import HotelCalifornia.Tracing.TraceParent
+import System.Environment (getEnvironment)
 import Options.Applicative
 import System.Exit
 import System.Process.Typed
@@ -39,8 +41,12 @@ runExecArgs ExecArgs {..} = do
         spanName =
             fromMaybe (Text.pack script) execArgsSpanName
 
-    inSpan spanName do
-        exitCode <- runProcess $ shell $ unwords $ NEL.toList execArgsScript
+    inSpan' spanName \span_ -> do
+        newEnv <- spanContextToEnvironment span_
+        fullEnv <- mappend newEnv <$> getEnvironment
+
+        let processConfig = shell $ unwords $ NEL.toList execArgsScript
+        exitCode <- runProcess $ setEnv fullEnv $ processConfig
         case exitCode of
             ExitSuccess ->
                 pure ()

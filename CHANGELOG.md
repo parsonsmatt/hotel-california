@@ -8,4 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
-## 0.1.0.0 - YYYY-MM-DD
+## 0.0.1.0 - 2023-09-12
+
+- Initial Release
+- Introduce `exec` functionality
+

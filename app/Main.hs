@@ -1,5 +1,6 @@
 module Main where
 
+import Data.Version (showVersion)
 import Paths_hotel_california (version)
 import HotelCalifornia.Exec
 import HotelCalifornia.Tracing (withGlobalTracing)
@@ -30,7 +31,7 @@ optionsParser =
         Command
             <$> generalOptionsParser
             <*> subCommandParser
-            <**> simpleVersioner (show version)
+            <**> simpleVersioner (showVersion version)
 
     generalOptionsParser =
         pure GlobalOptions

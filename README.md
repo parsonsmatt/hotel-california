@@ -9,16 +9,29 @@ The binary name is `hotel`.
 Currently, the only supported command is `exec`
 
 ```sh
-$ hotel exec -- help
+$ hotel exec --help
 Usage: hotel exec [-s|--span-name SPAN_NAME] SCRIPT [SCRIPT...]
 
   Execute the given command with tracing enabled
 
 Available options:
   -h,--help                Show this help text
+  -s,--span-name SPAN_NAME The name of the span that the program reports. By
+                           default, this is the script you pass in.
+  SCRIPT                   The command to run, along with any arguments. Best to
+                           use -- before providing the script, otherwise it may
+                           pass arguments to `hotel` instead of to your script
 ```
 
+Currently, the program only looks in environment variables for configuration.
 
+- `OTEL_EXPORTER_OTLP_ENDPOINT` (with a default to `localhost:4317`)
+- `OTEL_SERVICE_NAME`
+- `OTEL_EXPORTER_OTLP_HEADERS`
+- `OTEL_RESOURCE_ATTRIBUTES`
+- and probably others, see
+  [`hs-opentelemetry-sdk`](https://hackage.haskell.org/package/hs-opentelemetry-sdk)
+  for more information
 
 # Background/FAQ
 
@@ -94,8 +107,9 @@ $ trace group finish "$OUTER_GROUP"
 $ trace finish
 ```
 
-So any time you do `trace start`, you create a *root span*.
-But any time you do `trace group finish`, you create a *child span*.
+So any time you do `trace start`, you create an identifier for a parent span.
+But any time you do `trace group finish`, you look up the relevant parent span
+ID and then actually *create* a *child span*.
 
 This makes it difficult to create a span, and just "know" if you're in a root or not.
 You would need this in order to provide a composable interface: shell scripts calling other shell scripts which can all record spans.

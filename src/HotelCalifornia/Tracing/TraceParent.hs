@@ -9,11 +9,7 @@ import qualified Data.Text as Text
 import OpenTelemetry.Propagator.W3CTraceContext
 import OpenTelemetry.Trace.Core (SpanContext, isRemote, wrapSpanContext, Span)
 import System.Environment
-import Network.HTTP.Types (RequestHeaders, ResponseHeaders)
-import OpenTelemetry.Propagator
-import OpenTelemetry.Context
 import OpenTelemetry.Context.ThreadLocal
-import qualified Data.List as List
 import qualified OpenTelemetry.Context as Ctxt
 
 -- | This function looks up the @TRACEPARENT@ and @TRACECONTEXT@ environment
@@ -51,20 +47,3 @@ setParentSpanFromEnvironment = do
     mspanContext <- spanContextFromEnvironment
     for_ mspanContext \spanContext -> do
         adjustContext $ Ctxt.insertSpan (wrapSpanContext (spanContext {isRemote = True}))
-
-
--- -- | This 'Propagator' is a little Tricky. It uses the system environment to
--- -- lookup the trace span context using 'spanContextFromEnvironment'. It nee
--- environmentPropagator :: Propagator Context i o
--- environmentPropagator =
---     Propagator
---         { propagatorNames = ["environment-variables"]
---         , injector = \c o -> do
---
---             pure o
---         , extractor = \i c -> do
---             mspanContext <- spanContextFromEnvironment
---             pure $! case mspanContext of
---                 Nothing -> c
---                 Just s -> Ctxt.insertSpan (wrapSpanContext (s {isRemote = True})) c
---         }

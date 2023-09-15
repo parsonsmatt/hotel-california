@@ -82,6 +82,7 @@ library
     , hs-opentelemetry-vendor-honeycomb
     , http-types
     , optparse-applicative
+    , posix-escape
     , text
     , time
     , typed-process

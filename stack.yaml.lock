@@ -5,6 +5,13 @@
 
 packages:
 - completed:
+    hackage: posix-escape-0.1@sha256:adbb650397cd8685ea220b40739ee80d4e8329643a98aa2993a6f13a598bd18c,1160
+    pantry-tree:
+      sha256: e9824c495e3e2a3a1f737b5d2fcdd0ea1ce6b2919cec252c1ef7ca3b19dedf57
+      size: 386
+  original:
+    hackage: posix-escape-0.1
+- completed:
     hackage: honeycomb-0.1.0.1@sha256:255820a584335bf3474d8d7f604c0089c92f895c21e3b2b5f4131b7429e3dde6,2748
     pantry-tree:
       sha256: b8b779bd3bf53fbbc0bdfc6c7239256a0b1b4bf4f652cc5967ab35a207b65941

@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           hotel-california
-version:        0.0.1.0
+version:        0.0.2.0
 description:    Please see the README on GitHub at <https://github.com/parsonsmatt/hotel-california#readme>
 homepage:       https://github.com/parsonsmatt/hotel-california#readme
 bug-reports:    https://github.com/parsonsmatt/hotel-california/issues
@@ -145,6 +145,7 @@ executable hotel
     , hs-opentelemetry-vendor-honeycomb
     , http-types
     , optparse-applicative
+    , posix-escape
     , text
     , time
     , typed-process
@@ -208,6 +209,7 @@ test-suite hotel-california-test
     , hs-opentelemetry-vendor-honeycomb
     , http-types
     , optparse-applicative
+    , posix-escape
     , text
     , time
     , typed-process

@@ -10,7 +10,8 @@ Currently, the only supported command is `exec`
 
 ```sh
 $ hotel exec --help
-Usage: hotel exec [-s|--span-name SPAN_NAME] SCRIPT [SCRIPT...]
+Usage: hotel exec [-s|--span-name SPAN_NAME]
+                  (COMMAND [ARGUMENT]... | --shell SCRIPT)
 
   Execute the given command with tracing enabled
 
@@ -18,9 +19,8 @@ Available options:
   -h,--help                Show this help text
   -s,--span-name SPAN_NAME The name of the span that the program reports. By
                            default, this is the script you pass in.
-  SCRIPT                   The command to run, along with any arguments. Best to
-                           use -- before providing the script, otherwise it may
-                           pass arguments to `hotel` instead of to your script
+  --shell SCRIPT           Run an arbitrary shell script instead of running an
+                           executable command
 ```
 
 Currently, the program only looks in environment variables for configuration.

@@ -8,8 +8,24 @@ and this project adheres to the
 
 ## Unreleased
 
+## 0.0.2.0 - 2023-09-15
+
+- [#7](https://github.com/parsonsmatt/hotel-california/pull/7)
+    - Fixed escaping of shell commands. Previously, single quotes would not be
+      passed correctly, so a command like this:
+        ```
+        hotel exec -- cabal build --ghc-options='-Werror -ferror-spans'
+        ```
+      would get passed like `cabal ["build", "--ghc-options='-Werror'", "-ferror-spans'"]`.
+      This is now fixed, and it will be properly passed as `cabal ["build", "--ghc-options='-Werror -ferrorspans'"]`.
+    - CLI interface changed subtly - now, `hotel exec command [args]` will do a
+      process lookup for `command`. If you want to pass a shell script, instead
+      do:
+        ```
+        hotel exec --shell 'echo a && echo b || true'
+        ```
+
 ## 0.0.1.0 - 2023-09-12
 
 - Initial Release
 - Introduce `exec` functionality
-

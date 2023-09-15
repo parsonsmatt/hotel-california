@@ -5,6 +5,7 @@ packages:
 - .
 
 extra-deps:
+  - posix-escape-0.1
   - honeycomb-0.1.0.1
   - hs-opentelemetry-api-0.1.0.0
     # - hs-opentelemetry-exporter-otlp-0.0.1.4

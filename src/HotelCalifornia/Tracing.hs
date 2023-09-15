@@ -33,7 +33,7 @@ withGlobalTracing :: MonadUnliftIO m => m a -> m a
 withGlobalTracing act = do
     void $ attachContext Context.empty
     liftIO setParentSpanFromEnvironment
-    bracket initializeTracing shutdownTracerProvider $ \_ -> do
+    bracket (liftIO initializeGlobalTracerProvider) shutdownTracerProvider $ \_ -> do
         -- note: this is not in a span since we don't have a root span yet so it
         -- would not wind up in the trace in a helpful way anyway
         void $
@@ -50,13 +50,6 @@ withGlobalTracing act = do
         act
   where
     initializationTimeout = secondsToNominalDiffTime 3
-
-initializeTracing :: MonadUnliftIO m => m TracerProvider
-initializeTracing = do
-  (processors, tracerOptions') <- liftIO getTracerProviderInitializationOptions
-  provider <- createTracerProvider processors tracerOptions'
-  setGlobalTracerProvider provider
-  pure provider
 
 globalTracer :: MonadIO m => m Tracer
 globalTracer = getGlobalTracerProvider >>= \tp -> pure $ makeTracer tp "hotel-california" tracerOptions

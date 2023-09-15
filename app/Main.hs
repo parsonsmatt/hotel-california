@@ -24,7 +24,7 @@ optionsParser =
     info' :: Parser a -> String -> ParserInfo a
     info' p desc = info
         (helper <*> p)
-        (fullDesc <> progDesc desc)
+        (fullDesc <> progDesc desc <> noIntersperse)
 
     parser' :: Parser Command
     parser' =
@@ -48,7 +48,8 @@ optionsParser =
 main :: IO ()
 main = do
     withGlobalTracing do
-        Command {..} <- execParser optionsParser
+        let parserPrefs = defaultPrefs{ prefMultiSuffix = "..." }
+        Command {..} <- customExecParser parserPrefs optionsParser
         case commandSubCommand of
             Exec execArgs ->
                 runExecArgs execArgs

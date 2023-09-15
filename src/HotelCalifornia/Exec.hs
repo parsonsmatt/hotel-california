@@ -15,10 +15,37 @@ import Options.Applicative hiding (command)
 import System.Exit
 import System.Process.Typed
 
+data Subprocess = Proc (NonEmpty String) | Shell String
+
+commandToString :: Subprocess -> String
+commandToString (Proc tokens) = Escape.escapeMany (NEL.toList tokens)
+commandToString (Shell line) = line
+
+commandToProcessConfig :: Subprocess -> ProcessConfig () () ()
+commandToProcessConfig (Proc (command :| args)) = proc command args
+commandToProcessConfig (Shell line) = shell line
+
 data ExecArgs = ExecArgs
-    { execArgsScript :: NonEmpty String
+    { execArgsSubprocess :: Subprocess
     , execArgsSpanName :: Maybe Text
     }
+
+parseProc :: Parser (NonEmpty String)
+parseProc = do
+    command <- argument str (metavar "COMMAND")
+    arguments <- many (argument str (metavar "ARGUMENT"))
+    return (command :| arguments)
+
+parseShell :: Parser String
+parseShell =
+    option str
+        (   metavar "SCRIPT"
+        <>  long "shell"
+        <>  help "Run an arbitrary shell script instead of running an executable command"
+        )
+
+parseSubprocess :: Parser Subprocess
+parseSubprocess = fmap Proc parseProc <|> fmap Shell parseShell
 
 parseExecArgs :: Parser ExecArgs
 parseExecArgs = do
@@ -29,17 +56,12 @@ parseExecArgs = do
             , short 's'
             , help "The name of the span that the program reports. By default, this is the script you pass in."
             ]
-    execArgsScript1 <- argument str (metavar "SCRIPT" <> help "The command to run, along with any arguments. Best to use -- before providing the script, otherwise it may pass arguments to `hotel` instead of to your script")
-    execArgsScriptRest <- many $ argument str (metavar "SCRIPT...")
-    pure ExecArgs
-        { execArgsScript = execArgsScript1 :| execArgsScriptRest
-        , ..
-        }
+    execArgsSubprocess <- parseSubprocess
+    pure ExecArgs{..}
 
 runExecArgs :: ExecArgs -> IO ()
 runExecArgs ExecArgs {..} = do
-    let script =
-            Escape.escapeMany $ NEL.toList execArgsScript
+    let script = commandToString execArgsSubprocess
         spanName =
             fromMaybe (Text.pack script) execArgsSpanName
 
@@ -47,11 +69,9 @@ runExecArgs ExecArgs {..} = do
         newEnv <- spanContextToEnvironment span_
         fullEnv <- mappend newEnv <$> getEnvironment
 
-        let command :| args = execArgsScript
+        let processConfig = commandToProcessConfig execArgsSubprocess
 
-        let processConfig = proc command args
-
-        exitCode <- runProcess $ setEnv fullEnv $ processConfig
+        exitCode <- runProcess $ setEnv fullEnv processConfig
         case exitCode of
             ExitSuccess ->
                 pure ()

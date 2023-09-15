@@ -10,7 +10,8 @@ import qualified Data.Text as Text
 import HotelCalifornia.Tracing
 import HotelCalifornia.Tracing.TraceParent
 import System.Environment (getEnvironment)
-import Options.Applicative
+import qualified System.Posix.Escape.Unicode as Escape
+import Options.Applicative hiding (command)
 import System.Exit
 import System.Process.Typed
 
@@ -38,7 +39,7 @@ parseExecArgs = do
 runExecArgs :: ExecArgs -> IO ()
 runExecArgs ExecArgs {..} = do
     let script =
-            unwords $ NEL.toList execArgsScript
+            Escape.escapeMany $ NEL.toList execArgsScript
         spanName =
             fromMaybe (Text.pack script) execArgsSpanName
 
@@ -46,7 +47,10 @@ runExecArgs ExecArgs {..} = do
         newEnv <- spanContextToEnvironment span_
         fullEnv <- mappend newEnv <$> getEnvironment
 
-        let processConfig = shell $ unwords $ NEL.toList execArgsScript
+        let command :| args = execArgsScript
+
+        let processConfig = proc command args
+
         exitCode <- runProcess $ setEnv fullEnv $ processConfig
         case exitCode of
             ExitSuccess ->

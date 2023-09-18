@@ -6,7 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to the
 [Haskell Package Versioning Policy](https://pvp.haskell.org/).
 
-## Unreleased
+## 0.0.3.0 - 2023-09-18
+
+- [#13](https://github.com/parsonsmatt/hotel-california/pull/13)
+    - The `hotel` command will now propagate the `BAGGAGE` environment variable,
+      according to the [W3C working draft](https://www.w3.org/TR/baggage/),
+      similar how it already propagates `TRACEPARENT` and `TRACESTATE`.
 
 ## 0.0.2.0 - 2023-09-15
 

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to the
 [Haskell Package Versioning Policy](https://pvp.haskell.org/).
 
+## Unreleased
+
+- [#14](https://github.com/parsonsmatt/hotel-california/pull/14/)
+    - Add the `--set-sigint-status` to control how `Ctrl-C` and `SIGINT` are
+      reported.
+
 ## 0.0.3.0 - 2023-09-18
 
 - [#13](https://github.com/parsonsmatt/hotel-california/pull/13)

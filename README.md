@@ -11,6 +11,7 @@ Currently, the only supported command is `exec`
 ```sh
 $ hotel exec --help
 Usage: hotel exec [-s|--span-name SPAN_NAME]
+                  [-i|--set-sigint-status SPAN_STATUS]
                   (COMMAND [ARGUMENT]... | --shell SCRIPT)
 
   Execute the given command with tracing enabled
@@ -19,6 +20,9 @@ Available options:
   -h,--help                Show this help text
   -s,--span-name SPAN_NAME The name of the span that the program reports. By
                            default, this is the script you pass in.
+  -i,--set-sigint-status SPAN_STATUS
+                           The status reported when the process is killed with
+                           SIGINT.
   --shell SCRIPT           Run an arbitrary shell script instead of running an
                            executable command
 ```

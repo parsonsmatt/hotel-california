@@ -8,7 +8,7 @@ and this project adheres to the
 
 ## Unreleased
 
-- []()
+- [#14](https://github.com/parsonsmatt/hotel-california/pull/14/)
     - Add the `--set-sigint-status` to control how `Ctrl-C` and `SIGINT` are
       reported.
 

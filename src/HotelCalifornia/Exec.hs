@@ -2,6 +2,8 @@
 -- enabled.
 module HotelCalifornia.Exec where
 
+import Conduit
+import Data.Conduit.Binary
 import qualified Control.Exception as Exception
 import qualified Data.Char as Char
 import Data.List.NonEmpty (NonEmpty(..))
@@ -17,6 +19,9 @@ import System.Environment (getEnvironment)
 import System.Exit
 import qualified System.Posix.Escape.Unicode as Escape
 import System.Process.Typed
+import qualified Data.ByteString as BS
+import System.IO
+import Control.Concurrent.Async
 
 data Subprocess = Proc (NonEmpty String) | Shell String
 
@@ -111,12 +116,48 @@ runExecArgs ExecArgs {..} = do
                     other ->
                         Exception.throwIO other
 
-        mexitCode <- Exception.handle handleSigInt $ fmap Just $ runProcess $ setEnv fullEnv processConfig
+        -- (mexitCode, stderr, stdout)
+        mresult
+            <- Exception.handle handleSigInt $ fmap Just $ runProcessCapturingOutput $ setEnv fullEnv processConfig
 
-        case mexitCode of
-            Just ExitSuccess ->
+        case mresult of
+            Just (ExitSuccess, _, _) ->
                 pure ()
-            Just exitCode ->
+            Just (exitCode, stdoutLines, stderrLines) -> do
+                print ("stdout: ", stdoutLines)
+                print ("stderr: ", stderrLines)
                 exitWith exitCode
             Nothing ->
                 pure ()
+
+
+runProcessCapturingOutput :: ProcessConfig stdin stdout stderr -> IO (ExitCode, BS.ByteString, BS.ByteString)
+runProcessCapturingOutput config = do
+    let finalproc = setStdout createPipe $ setStderr createPipe $ config
+    withProcessWait finalproc \process -> do
+        let procStderr = getStderr process
+            procStdout = getStdout process
+            teeHandle p o =
+                runConduit do
+                    sourceHandle p
+                        .| conduitHandle o
+                        .| takeLastNC 1024
+
+        withAsync (teeHandle procStderr stderr) \stderrThread -> do
+            withAsync (teeHandle procStdout stdout) \stdoutThread -> do
+                exitCode <- waitExitCode process
+                stderrContents <- wait stderrThread
+                stdoutContents <- wait stdoutThread
+                pure (exitCode, stderrContents, stdoutContents)
+
+takeLastNC :: Monad m => Int -> ConduitT BS.ByteString o m BS.ByteString
+takeLastNC i = go mempty
+  where
+    go !acc = do
+        mbytes <- await
+        case mbytes of
+            Nothing ->
+                pure acc
+            Just bytes ->
+                go (BS.takeEnd i (acc <> bytes))
+

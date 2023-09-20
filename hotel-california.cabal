@@ -34,6 +34,7 @@ library
   hs-source-dirs:
       src
   default-extensions:
+      BangPatterns
       BlockArguments
       DataKinds
       DefaultSignatures
@@ -72,8 +73,11 @@ library
       ApplicativeDo
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded
   build-depends:
-      base >=4.7 && <5
+      async
+    , base >=4.7 && <5
     , bytestring
+    , conduit
+    , conduit-extra
     , hs-opentelemetry-api >=0.1.0.0
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
@@ -96,6 +100,7 @@ executable hotel
   hs-source-dirs:
       app
   default-extensions:
+      BangPatterns
       BlockArguments
       DataKinds
       DefaultSignatures
@@ -134,8 +139,11 @@ executable hotel
       ApplicativeDo
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      async
+    , base >=4.7 && <5
     , bytestring
+    , conduit
+    , conduit-extra
     , hotel-california
     , hs-opentelemetry-api >=0.1.0.0
     , hs-opentelemetry-exporter-otlp
@@ -160,6 +168,7 @@ test-suite hotel-california-test
   hs-source-dirs:
       test
   default-extensions:
+      BangPatterns
       BlockArguments
       DataKinds
       DefaultSignatures
@@ -198,8 +207,11 @@ test-suite hotel-california-test
       ApplicativeDo
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      async
+    , base >=4.7 && <5
     , bytestring
+    , conduit
+    , conduit-extra
     , hotel-california
     , hs-opentelemetry-api >=0.1.0.0
     , hs-opentelemetry-exporter-otlp

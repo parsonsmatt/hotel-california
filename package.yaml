@@ -21,7 +21,10 @@ description:         Please see the README on GitHub at <https://github.com/pars
 
 dependencies:
 - base >= 4.7 && < 5
+- async
 - bytestring
+- conduit
+- conduit-extra
 - hs-opentelemetry-api >= 0.1.0.0
 - hs-opentelemetry-exporter-otlp
 - hs-opentelemetry-propagator-w3c
@@ -37,6 +40,7 @@ dependencies:
 - unliftio
 
 default-extensions:
+- BangPatterns
 - BlockArguments
 - DataKinds
 - DefaultSignatures

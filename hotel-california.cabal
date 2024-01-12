@@ -87,6 +87,7 @@ library
     , time
     , typed-process
     , unliftio
+    , unordered-containers
   default-language: Haskell2010
 
 executable hotel

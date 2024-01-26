@@ -8,9 +8,15 @@ and this project adheres to the
 
 ## Unreleased
 
+## 0.0.4.0 - 2024-01-26
+
 - [#14](https://github.com/parsonsmatt/hotel-california/pull/14/)
     - Add the `--set-sigint-status` to control how `Ctrl-C` and `SIGINT` are
       reported.
+- [#16](https://github.com/parsonsmatt/hotel-california/pull/16)
+    - You can now provide attributes for the span that `hotel-california`
+      creates by passing the CLI argument `--attribute KEY=VALUE`. Only string
+      attributes are currently supported.
 
 ## 0.0.3.0 - 2023-09-18
 

@@ -7,11 +7,14 @@ import qualified Data.Char as Char
 import Data.List.NonEmpty (NonEmpty(..))
 import qualified Data.List.NonEmpty as NEL
 import Data.Maybe (fromMaybe)
-import Data.Text (Text)
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Text as Text
+import Data.Text (Text)
 import HotelCalifornia.Tracing
 import HotelCalifornia.Tracing.TraceParent
 import qualified OpenTelemetry.Trace.Core as Otel
+import OpenTelemetry.Trace (Attribute(..), PrimitiveAttribute(..))
 import Options.Applicative hiding (command)
 import System.Environment (getEnvironment)
 import System.Exit
@@ -32,6 +35,7 @@ data ExecArgs = ExecArgs
     { execArgsSubprocess :: Subprocess
     , execArgsSpanName :: Maybe Text
     , execArgsSigintStatus :: SpanStatus'
+    , execArgsAttributes :: HashMap Text Attribute
     }
 
 -- | A variant of 'SpanStatus' that does not include a 'Text' for error.
@@ -65,6 +69,14 @@ parseShell =
 parseSubprocess :: Parser Subprocess
 parseSubprocess = fmap Proc parseProc <|> fmap Shell parseShell
 
+-- | Parse a `key=value` string into an attribute.
+parseAttribute :: String -> Either String (Text, Attribute)
+parseAttribute input = do
+    let (key, value') = Text.breakOn "=" $ Text.pack input
+    if Text.null value' || Text.null key
+    then Left $ "Attributes must contain a non-empty key and value separated by `=`: " <> input
+    else pure $ (key, AttributeValue $ TextAttribute $ Text.drop 1 value')
+
 parseExecArgs :: Parser ExecArgs
 parseExecArgs = do
     execArgsSpanName <- optional do
@@ -82,6 +94,13 @@ parseExecArgs = do
             , help "The status reported when the process is killed with SIGINT."
             , value SpanUnset
             ]
+    execArgsAttributes <-
+        HashMap.fromList <$> (many $ option (eitherReader parseAttribute) $ mconcat
+            [ metavar "KEY=VALUE"
+            , long "attribute"
+            , short 'a'
+            , help "A string attribute to add to the span."
+            ])
     execArgsSubprocess <- parseSubprocess
     pure ExecArgs{..}
 
@@ -90,8 +109,9 @@ runExecArgs ExecArgs {..} = do
     let script = commandToString execArgsSubprocess
         spanName =
             fromMaybe (Text.pack script) execArgsSpanName
+        spanArguments = defaultSpanArguments { Otel.attributes = execArgsAttributes }
 
-    inSpan' spanName \span_ -> do
+    inSpanWith' spanName spanArguments \span_ -> do
         newEnv <- spanContextToEnvironment span_
         fullEnv <- mappend newEnv <$> getEnvironment
 

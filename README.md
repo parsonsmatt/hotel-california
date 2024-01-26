@@ -12,6 +12,7 @@ Currently, the only supported command is `exec`
 $ hotel exec --help
 Usage: hotel exec [-s|--span-name SPAN_NAME]
                   [-i|--set-sigint-status SPAN_STATUS]
+                  [-a|--attribute KEY=VALUE]...
                   (COMMAND [ARGUMENT]... | --shell SCRIPT)
 
   Execute the given command with tracing enabled
@@ -23,6 +24,7 @@ Available options:
   -i,--set-sigint-status SPAN_STATUS
                            The status reported when the process is killed with
                            SIGINT.
+  -a,--attribute KEY=VALUE A string attribute to add to the span.
   --shell SCRIPT           Run an arbitrary shell script instead of running an
                            executable command
 ```

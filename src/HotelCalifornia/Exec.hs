@@ -20,6 +20,7 @@ import System.Environment (getEnvironment)
 import System.Exit
 import qualified System.Posix.Escape.Unicode as Escape
 import System.Process.Typed
+import HotelCalifornia.Which (which)
 
 data Subprocess = Proc (NonEmpty String) | Shell String
 
@@ -95,7 +96,7 @@ parseExecArgs = do
             , value SpanUnset
             ]
     execArgsAttributes <-
-        HashMap.fromList <$> (many $ option (eitherReader parseAttribute) $ mconcat
+        HashMap.fromList <$> many (option (eitherReader parseAttribute) $ mconcat
             [ metavar "KEY=VALUE"
             , long "attribute"
             , short 'a'
@@ -104,29 +105,51 @@ parseExecArgs = do
     execArgsSubprocess <- parseSubprocess
     pure ExecArgs{..}
 
+makeInitialAttributes :: Subprocess -> HashMap Text Attribute -> IO (HashMap Text Attribute)
+makeInitialAttributes subprocess extraAttributes = do
+    processAttributes <-
+        case subprocess of
+          Proc (command :| args) -> do
+              pathAttribute <-
+                  (foldMap (\path -> [(executablePathName, Otel.toAttribute $ Text.pack path)]))
+                  <$> which command
+              pure $ HashMap.fromList $
+                [ (commandArgsName, Otel.toAttribute $ map Text.pack args)
+                , (executableName, Otel.toAttribute $ Text.pack command)
+                ] <> pathAttribute
+          Shell _command -> pure mempty
+
+    pure $ processAttributes <> extraAttributes
+
 runExecArgs :: ExecArgs -> IO ()
 runExecArgs ExecArgs {..} = do
+    initialAttributes <- makeInitialAttributes execArgsSubprocess execArgsAttributes
+
     let script = commandToString execArgsSubprocess
         spanName =
             fromMaybe (Text.pack script) execArgsSpanName
-        spanArguments = defaultSpanArguments { Otel.attributes = execArgsAttributes }
+        spanArguments = defaultSpanArguments { Otel.attributes = initialAttributes }
 
-    inSpanWith' spanName spanArguments \span_ -> do
-        newEnv <- spanContextToEnvironment span_
+    inSpanWith' spanName spanArguments \span' -> do
+        newEnv <- spanContextToEnvironment span'
         fullEnv <- mappend newEnv <$> getEnvironment
 
         let processConfig = commandToProcessConfig execArgsSubprocess
 
         let handleSigInt =
                 \case
-                    Exception.UserInterrupt ->
+                    Exception.UserInterrupt -> do
+                        Otel.addAttribute span' exitStatusName (-2 :: Int) -- SIGINT
                         case execArgsSigintStatus of
                             SpanUnset ->
                                 pure Nothing
                             SpanOk -> do
-                                Otel.setStatus span_ Otel.Ok
+                                Otel.setStatus span' Otel.Ok
                                 pure Nothing
                             SpanError -> do
+                                -- `hs-opentelemetry` will automatically mark a
+                                -- span as an error if it ends with an
+                                -- exception.
                                 Exception.throwIO Exception.UserInterrupt
                     other ->
                         Exception.throwIO other
@@ -134,9 +157,25 @@ runExecArgs ExecArgs {..} = do
         mexitCode <- Exception.handle handleSigInt $ fmap Just $ runProcess $ setEnv fullEnv processConfig
 
         case mexitCode of
-            Just ExitSuccess ->
-                pure ()
-            Just exitCode ->
-                exitWith exitCode
+            Just exitCode -> do
+                Otel.addAttribute span' exitStatusName
+                    case exitCode of
+                       ExitSuccess -> 0
+                       ExitFailure status -> status
+                case exitCode of
+                    ExitSuccess -> pure ()
+                    ExitFailure _ -> exitWith exitCode
             Nothing ->
                 pure ()
+
+exitStatusName :: Text
+exitStatusName = "process.exit_status"
+
+executablePathName :: Text
+executablePathName = "process.executable.path"
+
+executableName :: Text
+executableName = "process.executable.path"
+
+commandArgsName :: Text
+commandArgsName = "process.command_args"

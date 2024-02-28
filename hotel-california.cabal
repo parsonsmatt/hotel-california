@@ -30,6 +30,7 @@ library
       HotelCalifornia.Tracing
       HotelCalifornia.Tracing.TraceParent
   other-modules:
+      HotelCalifornia.Which
       Paths_hotel_california
   hs-source-dirs:
       src
@@ -88,6 +89,8 @@ library
     , typed-process
     , unliftio
     , unordered-containers
+    , filepath
+    , directory
   default-language: Haskell2010
 
 executable hotel

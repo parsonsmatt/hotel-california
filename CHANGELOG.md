@@ -8,6 +8,12 @@ and this project adheres to the
 
 ## Unreleased
 
+- [#19](https://github.com/parsonsmatt/hotel-california/pull/19/)
+    - Record the command's exit status (`process.exit_status`) and command
+      attributes.
+    - This replaces the default `process.executable.name` and related attributes
+      set by `hs-opentelemetry`.
+
 ## 0.0.4.0 - 2024-01-26
 
 - [#14](https://github.com/parsonsmatt/hotel-california/pull/14/)

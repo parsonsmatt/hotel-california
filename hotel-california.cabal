@@ -1,11 +1,11 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.4.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 
 name:           hotel-california
-version:        0.0.4.0
+version:        0.0.5.0
 description:    Please see the README on GitHub at <https://github.com/parsonsmatt/hotel-california#readme>
 homepage:       https://github.com/parsonsmatt/hotel-california#readme
 bug-reports:    https://github.com/parsonsmatt/hotel-california/issues
@@ -30,8 +30,8 @@ library
       HotelCalifornia.Tracing
       HotelCalifornia.Tracing.TraceParent
   other-modules:
-      HotelCalifornia.Which
       Paths_hotel_california
+      HotelCalifornia.Which
   hs-source-dirs:
       src
   default-extensions:
@@ -75,6 +75,8 @@ library
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , directory
+    , filepath
     , hs-opentelemetry-api >=0.1.0.0
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
@@ -89,8 +91,6 @@ library
     , typed-process
     , unliftio
     , unordered-containers
-    , filepath
-    , directory
   default-language: Haskell2010
 
 executable hotel
@@ -140,6 +140,8 @@ executable hotel
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , directory
+    , filepath
     , hotel-california
     , hs-opentelemetry-api >=0.1.0.0
     , hs-opentelemetry-exporter-otlp
@@ -205,6 +207,8 @@ test-suite hotel-california-test
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , directory
+    , filepath
     , hotel-california
     , hs-opentelemetry-api >=0.1.0.0
     , hs-opentelemetry-exporter-otlp

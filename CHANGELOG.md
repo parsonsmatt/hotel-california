@@ -8,6 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
+## 0.0.5.0 - 2024-02-29
+
 - [#19](https://github.com/parsonsmatt/hotel-california/pull/19/)
     - Record the command's exit status (`process.exit_status`) and command
       attributes.

@@ -121,6 +121,13 @@ makeInitialAttributes subprocess extraAttributes = do
 
     pure $ processAttributes <> extraAttributes
 
+runNoTracing :: Subprocess -> IO ()
+runNoTracing subproc = do
+    let processConfig = commandToProcessConfig subproc
+    userEnv <- getEnvironment
+    exitCode <- runProcess $ setEnv userEnv processConfig
+    exitWith exitCode
+
 runExecArgs :: ExecArgs -> IO ()
 runExecArgs ExecArgs {..} = do
     initialAttributes <- makeInitialAttributes execArgsSubprocess execArgsAttributes

@@ -29,14 +29,14 @@ import UnliftIO
 --   up the provider afterwards.
 --
 --   This also sets up an empty context (creating a new trace ID).
-withGlobalTracing :: MonadUnliftIO m => m a -> m a
+withGlobalTracing :: MonadUnliftIO m => (Maybe Honeycomb.HoneycombTarget -> m a) -> m a
 withGlobalTracing act = do
     void $ attachContext Context.empty
     liftIO setParentSpanFromEnvironment
     bracket (liftIO initializeGlobalTracerProvider) shutdownTracerProvider $ \_ -> do
         -- note: this is not in a span since we don't have a root span yet so it
         -- would not wind up in the trace in a helpful way anyway
-        void $
+        mTarget <-
           Honeycomb.getOrInitializeHoneycombTargetInContext initializationTimeout
             `catch` \(e :: SomeException) -> do
               -- we are too early in initialization to be able to use a normal logger,
@@ -47,9 +47,9 @@ withGlobalTracing act = do
               liftIO . BS8.hPutStrLn stderr $ "error setting up Honeycomb trace links: " <> (BS8.pack $ displayException e)
               pure Nothing
 
-        act
+        act mTarget
   where
-    initializationTimeout = secondsToNominalDiffTime 3
+    initializationTimeout = secondsToNominalDiffTime 1
 
 globalTracer :: MonadIO m => m Tracer
 globalTracer = getGlobalTracerProvider >>= \tp -> pure $ makeTracer tp "hotel-california" tracerOptions

@@ -8,6 +8,13 @@ and this project adheres to the
 
 ## Unreleased
 
+## 0.0.6.0 - 2024-03-28
+
+- [#20](https://github.com/parsonsmatt/hotel-california/pull/19/)
+    - Reduce Honeycomb target initialization timeout from 3 seconds to 1 second.
+    - `withGlobalTracing` now expects a callback that accepts the honeycomb target.
+    - Executable bypasses OTEL operations if Honeycomb target cannot be initialized.
+
 ## 0.0.5.0 - 2024-02-29
 
 - [#19](https://github.com/parsonsmatt/hotel-california/pull/19/)

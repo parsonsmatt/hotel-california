@@ -20,7 +20,7 @@ data SubCommand
 programDescription :: Doc
 programDescription = cat [
     "`hotel-california` is a tool for OTel tracing of shell scripts, inspired by `otel-cli`.",
-    "For subcommand help, say `hotel SUBCOMMAND --help. Currently, the only supported subcommand is `exec`."
+    "For help with a command, say `hotel COMMAND --help`. Currently, the only supported command is `exec`."
    ]
    <> hardline <> hardline
    <> "Check out the repository any time you like at https://github.com/parsonsmatt/hotel-california."

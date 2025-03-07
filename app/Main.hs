@@ -5,7 +5,7 @@ import Paths_hotel_california (version)
 import HotelCalifornia.Exec
 import HotelCalifornia.Tracing (withGlobalTracing)
 import Options.Applicative
-import Options.Applicative.Help.Pretty (Doc, cat, hardline)
+import Options.Applicative.Help.Pretty (Doc, vsep)
 
 data Command = Command
     { commandGlobalOptions :: GlobalOptions
@@ -18,12 +18,12 @@ data SubCommand
     = Exec ExecArgs
 
 programDescription :: Doc
-programDescription = cat [
-    "`hotel-california` is a tool for OTel tracing of shell scripts, inspired by `otel-cli`.",
-    "For help with a command, say `hotel COMMAND --help`. Currently, the only supported command is `exec`."
-   ]
-   <> hardline <> hardline
-   <> "Check out the repository any time you like at https://github.com/parsonsmatt/hotel-california."
+programDescription = vsep
+  [ "`hotel-california` is a tool for OTel tracing of shell scripts, inspired by `otel-cli`."
+  , "For help with a command, say `hotel COMMAND --help`. Currently, the only supported command is `exec`."
+  , ""
+  , "Check out the repository any time you like at https://github.com/parsonsmatt/hotel-california."
+  ]
 
 optionsParser :: ParserInfo Command
 optionsParser =

@@ -6,17 +6,17 @@ module HotelCalifornia.Tracing.TraceParent
     , setParentSpanFromEnvironment
     ) where
 
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Char8 as BS8
-import qualified Data.Text.Encoding as TE
-import qualified Data.Text as Text
+import Data.ByteString qualified as BS
+import Data.ByteString.Char8 qualified as BS8
+import Data.Text qualified as Text
+import Data.Text.Encoding qualified as TE
 import OpenTelemetry.Baggage (Baggage)
-import OpenTelemetry.Propagator.W3CTraceContext
-import OpenTelemetry.Trace.Core (SpanContext, isRemote, wrapSpanContext, Span)
-import System.Environment
+import OpenTelemetry.Context qualified as Ctxt
 import OpenTelemetry.Context.ThreadLocal
-import qualified OpenTelemetry.Context as Ctxt
-import qualified OpenTelemetry.Propagator.W3CBaggage as W3CBaggage
+import OpenTelemetry.Propagator.W3CBaggage qualified as W3CBaggage
+import OpenTelemetry.Propagator.W3CTraceContext
+import OpenTelemetry.Trace.Core (Span, SpanContext, isRemote, wrapSpanContext)
+import System.Environment
 
 -- | This function looks up the @TRACEPARENT@ and @TRACECONTEXT@ environment
 -- variables and returns a @'Maybe' 'SpanContext'@ constructed from them.
@@ -32,7 +32,8 @@ baggageFromEnvironment :: IO (Maybe Baggage)
 baggageFromEnvironment = do
     mBaggageBytes <- lookupEnvBS "BAGGAGE"
 
-    let mBaggage = do
+    let
+        mBaggage = do
             baggageBytes <- mBaggageBytes
             W3CBaggage.decodeBaggage baggageBytes
 
@@ -56,7 +57,8 @@ spanContextToEnvironment span_ = do
 
     context <- getContext
 
-    let baggageVariables =
+    let
+        baggageVariables =
             case Ctxt.lookupBaggage context of
                 Just baggage ->
                     [("BAGGAGE", BS8.unpack (W3CBaggage.encodeBaggage baggage))]
@@ -64,10 +66,10 @@ spanContextToEnvironment span_ = do
                     []
 
     pure
-        (   [ ("TRACEPARENT", BS8.unpack traceParent)
-            , ("TRACESTATE", BS8.unpack traceState)
-            ]
-        <>  baggageVariables
+        ( [ ("TRACEPARENT", BS8.unpack traceParent)
+          , ("TRACESTATE", BS8.unpack traceState)
+          ]
+            <> baggageVariables
         )
 
 -- | This function should be called after you've initialized and attached the
@@ -77,16 +79,18 @@ setParentSpanFromEnvironment = do
     mSpanContext <- spanContextFromEnvironment
     mBaggage <- baggageFromEnvironment
 
-    let insertSpanContext =
+    let
+        insertSpanContext =
             case mSpanContext of
                 Nothing ->
                     id
                 Just spanContext ->
-                    Ctxt.insertSpan (wrapSpanContext spanContext{ isRemote = True })
+                    Ctxt.insertSpan (wrapSpanContext spanContext{isRemote = True})
 
-    let insertBaggage =
+    let
+        insertBaggage =
             case mBaggage of
-                Nothing      -> id
+                Nothing -> id
                 Just baggage -> Ctxt.insertBaggage baggage
 
     adjustContext (insertBaggage . insertSpanContext)

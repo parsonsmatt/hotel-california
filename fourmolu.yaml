@@ -2,7 +2,7 @@
 indentation: 4
 
 # Max line length for automatic line breaking
-column-limit: none
+column-limit: 80
 
 # Styling of arrows in type signatures (choices: trailing, leading, or leading-args)
 function-arrows: trailing
@@ -26,13 +26,13 @@ record-brace-space: false
 newlines-between-decls: 1
 
 # How to print Haddock comments (choices: single-line, multi-line, or multi-line-compact)
-haddock-style: multi-line
+haddock-style: single-line
 
 # How to print module docstring
 haddock-style-module: null
 
 # Styling of let blocks (choices: auto, inline, newline, or mixed)
-let-style: auto
+let-style: newline
 
 # How to align the 'in' keyword with respect to the 'let' keyword (choices: left-align, right-align, or no-space)
 in-style: right-align
@@ -69,4 +69,3 @@ reexports: []
 
 # Modules defined by the current Cabal package for import grouping
 local-modules: []
-

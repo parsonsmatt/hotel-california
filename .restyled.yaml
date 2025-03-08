@@ -1,0 +1,4 @@
+restylers:
+  - fourmolu
+  - stylish-haskell:
+      enabled: false

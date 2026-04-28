@@ -6,7 +6,6 @@ packages:
 
 extra-deps:
   - posix-escape-0.1
-  - honeycomb-0.1.0.1
   - hs-opentelemetry-api-0.1.0.0
     # - hs-opentelemetry-exporter-otlp-0.0.1.4
   - hs-opentelemetry-otlp-0.0.1.0
@@ -14,7 +13,6 @@ extra-deps:
   - hs-opentelemetry-propagator-w3c-0.0.1.3
   - hs-opentelemetry-sdk-0.0.3.6
   - hs-opentelemetry-utils-exceptions-0.2.0.0
-  - hs-opentelemetry-vendor-honeycomb-0.0.1.1
   - thread-utils-context-0.3.0.3
   - thread-utils-finalizers-0.1.0.0
   - github: parsonsmatt/hs-opentelemetry

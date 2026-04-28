@@ -4,24 +4,23 @@ module HotelCalifornia.Tracing
     ) where
 
 import Control.Monad
-import qualified Data.ByteString.Char8 as BS8
+import Data.List (isPrefixOf)
 import Data.Text (Text)
-import Data.Time
 import HotelCalifornia.Tracing.TraceParent
 import OpenTelemetry.Context as Context hiding (lookup)
 import OpenTelemetry.Context.ThreadLocal (attachContext)
 import OpenTelemetry.Trace hiding
-       ( SpanKind(..)
-       , SpanStatus(..)
-       , addAttribute
-       , addAttributes
-       , createSpan
-       , inSpan
-       , inSpan'
-       , inSpan''
-       )
-import qualified OpenTelemetry.Trace as Trace
-import qualified OpenTelemetry.Vendor.Honeycomb as Honeycomb
+    ( SpanKind (..)
+    , SpanStatus (..)
+    , addAttribute
+    , addAttributes
+    , createSpan
+    , inSpan
+    , inSpan'
+    , inSpan''
+    )
+import OpenTelemetry.Trace qualified as Trace
+import System.Environment (getEnvironment)
 import UnliftIO
 
 -- | Initialize the global tracing provider for the application and run an action
@@ -29,30 +28,31 @@ import UnliftIO
 --   up the provider afterwards.
 --
 --   This also sets up an empty context (creating a new trace ID).
-withGlobalTracing :: MonadUnliftIO m => (Maybe Honeycomb.HoneycombTarget -> m a) -> m a
+--
+--   The callback receives 'True' when an OTLP exporter is configured (any
+--   @OTEL_EXPORTER_*@ env-var is set) and tracing has been initialized, and
+--   'False' otherwise — in which case the caller should bypass tracing.
+withGlobalTracing :: (MonadUnliftIO m) => (Bool -> m a) -> m a
 withGlobalTracing act = do
     void $ attachContext Context.empty
     liftIO setParentSpanFromEnvironment
-    bracket (liftIO initializeGlobalTracerProvider) shutdownTracerProvider $ \_ -> do
-        -- note: this is not in a span since we don't have a root span yet so it
-        -- would not wind up in the trace in a helpful way anyway
-        mTarget <-
-          Honeycomb.getOrInitializeHoneycombTargetInContext initializationTimeout
-            `catch` \(e :: SomeException) -> do
-              -- we are too early in initialization to be able to use a normal logger,
-              -- but this needs to get out somehow.
-              --
-              -- honeycomb links are not load-bearing, so we let them just not come
-              -- up if the API fails.
-              liftIO . BS8.hPutStrLn stderr $ "error setting up Honeycomb trace links: " <> (BS8.pack $ displayException e)
-              pure Nothing
+    hasOtelExporter <- liftIO otelExporterConfigured
+    if hasOtelExporter
+        then bracket (liftIO initializeGlobalTracerProvider) shutdownTracerProvider $ \_ ->
+            act True
+        else act False
 
-        act mTarget
+-- | Returns 'True' iff any @OTEL_EXPORTER_*@ environment variable is set with
+--   a non-empty value. Used to decide whether to initialize tracing at all.
+otelExporterConfigured :: IO Bool
+otelExporterConfigured =
+    any isOtelExporter <$> getEnvironment
   where
-    initializationTimeout = secondsToNominalDiffTime 1
+    isOtelExporter (k, v) = "OTEL_EXPORTER_" `isPrefixOf` k && not (null v)
 
-globalTracer :: MonadIO m => m Tracer
-globalTracer = getGlobalTracerProvider >>= \tp -> pure $ makeTracer tp "hotel-california" tracerOptions
+globalTracer :: (MonadIO m) => m Tracer
+globalTracer =
+    getGlobalTracerProvider >>= \tp -> pure $ makeTracer tp "hotel-california" tracerOptions
 
 inSpan' :: (MonadUnliftIO m) => Text -> (Span -> m a) -> m a
 inSpan' spanName =
@@ -62,7 +62,8 @@ inSpanWith :: (MonadUnliftIO m) => Text -> SpanArguments -> m a -> m a
 inSpanWith spanName args action =
     inSpanWith' spanName args \_ -> action
 
-inSpanWith' :: (MonadUnliftIO m) => Text -> SpanArguments -> (Span -> m a) -> m a
+inSpanWith'
+    :: (MonadUnliftIO m) => Text -> SpanArguments -> (Span -> m a) -> m a
 inSpanWith' spanName args action = do
     tr <- globalTracer
     Trace.inSpan'' tr spanName args action

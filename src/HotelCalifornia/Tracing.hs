@@ -10,16 +10,16 @@ import HotelCalifornia.Tracing.TraceParent
 import OpenTelemetry.Context as Context hiding (lookup)
 import OpenTelemetry.Context.ThreadLocal (attachContext)
 import OpenTelemetry.Trace hiding
-       ( SpanKind(..)
-       , SpanStatus(..)
-       , addAttribute
-       , addAttributes
-       , createSpan
-       , inSpan
-       , inSpan'
-       , inSpan''
-       )
-import qualified OpenTelemetry.Trace as Trace
+    ( SpanKind (..)
+    , SpanStatus (..)
+    , addAttribute
+    , addAttributes
+    , createSpan
+    , inSpan
+    , inSpan'
+    , inSpan''
+    )
+import OpenTelemetry.Trace qualified as Trace
 import System.Environment (getEnvironment)
 import UnliftIO
 
@@ -32,7 +32,7 @@ import UnliftIO
 --   The callback receives 'True' when an OTLP exporter is configured (any
 --   @OTEL_EXPORTER_*@ env-var is set) and tracing has been initialized, and
 --   'False' otherwise — in which case the caller should bypass tracing.
-withGlobalTracing :: MonadUnliftIO m => (Bool -> m a) -> m a
+withGlobalTracing :: (MonadUnliftIO m) => (Bool -> m a) -> m a
 withGlobalTracing act = do
     void $ attachContext Context.empty
     liftIO setParentSpanFromEnvironment
@@ -50,8 +50,9 @@ otelExporterConfigured =
   where
     isOtelExporter (k, v) = "OTEL_EXPORTER_" `isPrefixOf` k && not (null v)
 
-globalTracer :: MonadIO m => m Tracer
-globalTracer = getGlobalTracerProvider >>= \tp -> pure $ makeTracer tp "hotel-california" tracerOptions
+globalTracer :: (MonadIO m) => m Tracer
+globalTracer =
+    getGlobalTracerProvider >>= \tp -> pure $ makeTracer tp "hotel-california" tracerOptions
 
 inSpan' :: (MonadUnliftIO m) => Text -> (Span -> m a) -> m a
 inSpan' spanName =
@@ -61,7 +62,8 @@ inSpanWith :: (MonadUnliftIO m) => Text -> SpanArguments -> m a -> m a
 inSpanWith spanName args action =
     inSpanWith' spanName args \_ -> action
 
-inSpanWith' :: (MonadUnliftIO m) => Text -> SpanArguments -> (Span -> m a) -> m a
+inSpanWith'
+    :: (MonadUnliftIO m) => Text -> SpanArguments -> (Span -> m a) -> m a
 inSpanWith' spanName args action = do
     tr <- globalTracer
     Trace.inSpan'' tr spanName args action

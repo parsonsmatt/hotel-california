@@ -56,11 +56,11 @@ optionsParser =
 
 main :: IO ()
 main = do
-    withGlobalTracing $ \mTarget -> do
+    withGlobalTracing $ \tracingEnabled -> do
         let parserPrefs = defaultPrefs{ prefMultiSuffix = "..." }
         Command {..} <- customExecParser parserPrefs optionsParser
         case commandSubCommand of
             Exec execArgs ->
-                case mTarget of
-                    Just _target -> runExecArgs execArgs
-                    Nothing -> runNoTracing $ execArgsSubprocess execArgs
+                if tracingEnabled
+                    then runExecArgs execArgs
+                    else runNoTracing $ execArgsSubprocess execArgs

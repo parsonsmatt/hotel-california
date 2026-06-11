@@ -2,25 +2,25 @@
 -- enabled.
 module HotelCalifornia.Exec where
 
-import qualified Control.Exception as Exception
-import qualified Data.Char as Char
-import Data.List.NonEmpty (NonEmpty(..))
-import qualified Data.List.NonEmpty as NEL
-import Data.Maybe (fromMaybe)
+import Control.Exception qualified as Exception
+import Data.Char qualified as Char
 import Data.HashMap.Strict (HashMap)
-import qualified Data.HashMap.Strict as HashMap
-import qualified Data.Text as Text
+import Data.HashMap.Strict qualified as HashMap
+import Data.List.NonEmpty (NonEmpty (..))
+import Data.List.NonEmpty qualified as NEL
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
+import Data.Text qualified as Text
 import HotelCalifornia.Tracing
 import HotelCalifornia.Tracing.TraceParent
-import qualified OpenTelemetry.Trace.Core as Otel
-import OpenTelemetry.Trace (Attribute(..), PrimitiveAttribute(..))
+import HotelCalifornia.Which (which)
+import OpenTelemetry.Trace (Attribute (..), PrimitiveAttribute (..))
+import OpenTelemetry.Trace.Core qualified as Otel
 import Options.Applicative hiding (command)
 import System.Environment (getEnvironment)
 import System.Exit
-import qualified System.Posix.Escape.Unicode as Escape
+import System.Posix.Escape.Unicode qualified as Escape
 import System.Process.Typed
-import HotelCalifornia.Which (which)
 
 data Subprocess = Proc (NonEmpty String) | Shell String
 
@@ -51,7 +51,9 @@ parseSpanStatus' = eitherReader \s ->
         "unset" -> Right SpanUnset
         "ok" -> Right SpanOk
         "error" -> Right SpanError
-        _ -> Left $ mconcat ["Expected one of `unset`, `ok`, or `error` for SPAN_STATUS. Got: ", s]
+        _ ->
+            Left $
+                mconcat ["Expected one of `unset`, `ok`, or `error` for SPAN_STATUS. Got: ", s]
 
 parseProc :: Parser (NonEmpty String)
 parseProc = do
@@ -61,10 +63,11 @@ parseProc = do
 
 parseShell :: Parser String
 parseShell =
-    option str
-        (   metavar "SCRIPT"
-        <>  long "shell"
-        <>  help "Run an arbitrary shell script instead of running an executable command"
+    option
+        str
+        ( metavar "SCRIPT"
+            <> long "shell"
+            <> help "Run an arbitrary shell script instead of running an executable command"
         )
 
 parseSubprocess :: Parser Subprocess
@@ -73,77 +76,94 @@ parseSubprocess = fmap Proc parseProc <|> fmap Shell parseShell
 -- | Parse a `key=value` string into an attribute.
 parseAttribute :: String -> Either String (Text, Attribute)
 parseAttribute input = do
-    let (key, value') = Text.breakOn "=" $ Text.pack input
+    let
+        (key, value') = Text.breakOn "=" $ Text.pack input
     if Text.null value' || Text.null key
-    then Left $ "Attributes must contain a non-empty key and value separated by `=`: " <> input
-    else pure $ (key, AttributeValue $ TextAttribute $ Text.drop 1 value')
+        then
+            Left $
+                "Attributes must contain a non-empty key and value separated by `=`: " <> input
+        else pure $ (key, AttributeValue $ TextAttribute $ Text.drop 1 value')
 
 parseExecArgs :: Parser ExecArgs
 parseExecArgs = do
     execArgsSpanName <- optional do
-        option str $ mconcat
-            [ metavar "SPAN_NAME"
-            , long "span-name"
-            , short 's'
-            , help "The name of the span that the program reports. By default, this is the script you pass in."
-            ]
+        option str $
+            mconcat
+                [ metavar "SPAN_NAME"
+                , long "span-name"
+                , short 's'
+                , help
+                    "The name of the span that the program reports. By default, this is the script you pass in."
+                ]
     execArgsSigintStatus <-
-        option parseSpanStatus' $ mconcat
-            [ metavar "SPAN_STATUS"
-            , long "set-sigint-status"
-            , short 'i'
-            , help "The status reported when the process is killed with SIGINT."
-            , value SpanUnset
-            ]
+        option parseSpanStatus' $
+            mconcat
+                [ metavar "SPAN_STATUS"
+                , long "set-sigint-status"
+                , short 'i'
+                , help "The status reported when the process is killed with SIGINT."
+                , value SpanUnset
+                ]
     execArgsAttributes <-
-        HashMap.fromList <$> many (option (eitherReader parseAttribute) $ mconcat
-            [ metavar "KEY=VALUE"
-            , long "attribute"
-            , short 'a'
-            , help "A string attribute to add to the span."
-            ])
+        HashMap.fromList
+            <$> many
+                ( option (eitherReader parseAttribute) $
+                    mconcat
+                        [ metavar "KEY=VALUE"
+                        , long "attribute"
+                        , short 'a'
+                        , help "A string attribute to add to the span."
+                        ]
+                )
     execArgsSubprocess <- parseSubprocess
     pure ExecArgs{..}
 
-makeInitialAttributes :: Subprocess -> HashMap Text Attribute -> IO (HashMap Text Attribute)
+makeInitialAttributes
+    :: Subprocess -> HashMap Text Attribute -> IO (HashMap Text Attribute)
 makeInitialAttributes subprocess extraAttributes = do
     processAttributes <-
         case subprocess of
-          Proc (command :| args) -> do
-              pathAttribute <-
-                  (foldMap (\path -> [(executablePathName, Otel.toAttribute $ Text.pack path)]))
-                  <$> which command
-              pure $ HashMap.fromList $
-                [ (commandArgsName, Otel.toAttribute $ map Text.pack args)
-                , (executableName, Otel.toAttribute $ Text.pack command)
-                ] <> pathAttribute
-          Shell _command -> pure mempty
+            Proc (command :| args) -> do
+                pathAttribute <-
+                    (foldMap (\path -> [(executablePathName, Otel.toAttribute $ Text.pack path)]))
+                        <$> which command
+                pure $
+                    HashMap.fromList $
+                        [ (commandArgsName, Otel.toAttribute $ map Text.pack args)
+                        , (executableName, Otel.toAttribute $ Text.pack command)
+                        ]
+                            <> pathAttribute
+            Shell _command -> pure mempty
 
     pure $ processAttributes <> extraAttributes
 
 runNoTracing :: Subprocess -> IO ()
 runNoTracing subproc = do
-    let processConfig = commandToProcessConfig subproc
+    let
+        processConfig = commandToProcessConfig subproc
     userEnv <- getEnvironment
     exitCode <- runProcess $ setEnv userEnv processConfig
     exitWith exitCode
 
 runExecArgs :: ExecArgs -> IO ()
-runExecArgs ExecArgs {..} = do
+runExecArgs ExecArgs{..} = do
     initialAttributes <- makeInitialAttributes execArgsSubprocess execArgsAttributes
 
-    let script = commandToString execArgsSubprocess
+    let
+        script = commandToString execArgsSubprocess
         spanName =
             fromMaybe (Text.pack script) execArgsSpanName
-        spanArguments = defaultSpanArguments { Otel.attributes = initialAttributes }
+        spanArguments = defaultSpanArguments{Otel.attributes = initialAttributes}
 
     inSpanWith' spanName spanArguments \span' -> do
         newEnv <- spanContextToEnvironment span'
         fullEnv <- mappend newEnv <$> getEnvironment
 
-        let processConfig = commandToProcessConfig execArgsSubprocess
+        let
+            processConfig = commandToProcessConfig execArgsSubprocess
 
-        let handleSigInt =
+        let
+            handleSigInt =
                 \case
                     Exception.UserInterrupt -> do
                         Otel.addAttribute span' exitStatusName (-2 :: Int) -- SIGINT
@@ -161,14 +181,20 @@ runExecArgs ExecArgs {..} = do
                     other ->
                         Exception.throwIO other
 
-        mexitCode <- Exception.handle handleSigInt $ fmap Just $ runProcess $ setEnv fullEnv processConfig
+        mexitCode <-
+            Exception.handle handleSigInt $
+                fmap Just $
+                    runProcess $
+                        setEnv fullEnv processConfig
 
         case mexitCode of
             Just exitCode -> do
-                Otel.addAttribute span' exitStatusName
+                Otel.addAttribute
+                    span'
+                    exitStatusName
                     case exitCode of
-                       ExitSuccess -> 0
-                       ExitFailure status -> status
+                        ExitSuccess -> 0
+                        ExitFailure status -> status
                 case exitCode of
                     ExitSuccess -> pure ()
                     ExitFailure _ -> exitWith exitCode

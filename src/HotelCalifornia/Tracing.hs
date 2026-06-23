@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 module HotelCalifornia.Tracing
     ( module HotelCalifornia.Tracing
     , defaultSpanArguments
@@ -34,7 +36,7 @@ withGlobalTracing
 withGlobalTracing act = do
     void $ attachContext Context.empty
     liftIO setParentSpanFromEnvironment
-    bracket (liftIO initializeGlobalTracerProvider) shutdownTracerProvider $ \_ -> do
+    withTracer $ \_ -> do
         -- note: this is not in a span since we don't have a root span yet so it
         -- would not wind up in the trace in a helpful way anyway
         mTarget <-
@@ -74,3 +76,13 @@ inSpanWith' spanName args action = do
 inSpan :: (MonadUnliftIO m) => Text -> m a -> m a
 inSpan spanName =
     inSpanWith spanName defaultSpanArguments
+
+withTracer :: (MonadUnliftIO m) => (TracerProvider -> m a) -> m a
+withTracer =
+    bracket (liftIO initializeGlobalTracerProvider) shutdown
+  where
+#if MIN_VERSION_hs_opentelemetry_api(1,0,0)
+    shutdown tp = shutdownTracerProvider tp Nothing
+#else
+    shutdown tp = shutdownTracerProvider tp
+#endif

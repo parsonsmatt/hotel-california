@@ -8,6 +8,11 @@ and this project adheres to the
 
 ## Unreleased
 
+## 0.0.6.2 - 2026-06-25
+
+- [#25](https://github.com/parsonsmatt/hotel-california/pull/25)
+    - Support `hs-optenelemetry` sdk 1.0
+
 ## 0.0.6.1 - 2025-03-07
 
 - [#21](https://github.com/parsonsmatt/hotel-california/pull/21)

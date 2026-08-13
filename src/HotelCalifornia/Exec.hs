@@ -3,6 +3,7 @@
 module HotelCalifornia.Exec where
 
 import Control.Exception qualified as Exception
+import Control.Monad (mfilter)
 import Data.Char qualified as Char
 import Data.HashMap.Strict (HashMap)
 import Data.HashMap.Strict qualified as HashMap
@@ -35,6 +36,7 @@ commandToProcessConfig (Shell line) = shell line
 data ExecArgs = ExecArgs
     { execArgsSubprocess :: Subprocess
     , execArgsSpanName :: Maybe Text
+    , execArgsServiceName :: Maybe Text
     , execArgsSigintStatus :: SpanStatus'
     , execArgsAttributes :: HashMap Text Attribute
     }
@@ -94,6 +96,17 @@ parseExecArgs = do
                 , short 's'
                 , help
                     "The name of the span that the program reports. By default, this is the script you pass in."
+                ]
+    -- A blank `--service '   '` is treated as if the flag was not passed at
+    -- all; otherwise we'd override the detected `service.name` with an empty
+    -- string, which the OpenTelemetry spec forbids.
+    execArgsServiceName <- fmap (mfilter (not . Text.null) . fmap Text.strip) $ optional do
+        option str $
+            mconcat
+                [ metavar "SERVICE_NAME"
+                , long "service"
+                , help
+                    "The service name that the span is reported under, overriding OTEL_SERVICE_NAME. Unlike OTEL_SERVICE_NAME, this does not change the service name that the command and its subprocesses report under."
                 ]
     execArgsSigintStatus <-
         option parseSpanStatus' $

@@ -10,7 +10,7 @@ Currently, the only supported command is `exec`
 
 ```sh
 $ hotel exec --help
-Usage: hotel exec [-s|--span-name SPAN_NAME]
+Usage: hotel exec [-s|--span-name SPAN_NAME] [--service SERVICE_NAME]
                   [-i|--set-sigint-status SPAN_STATUS]
                   [-a|--attribute KEY=VALUE]...
                   (COMMAND [ARGUMENT]... | --shell SCRIPT)
@@ -21,6 +21,11 @@ Available options:
   -h,--help                Show this help text
   -s,--span-name SPAN_NAME The name of the span that the program reports. By
                            default, this is the script you pass in.
+  --service SERVICE_NAME   The service name that the span is reported under,
+                           overriding OTEL_SERVICE_NAME. Unlike
+                           OTEL_SERVICE_NAME, this does not change the service
+                           name that the command and its subprocesses report
+                           under.
   -i,--set-sigint-status SPAN_STATUS
                            The status reported when the process is killed with
                            SIGINT.
@@ -29,7 +34,8 @@ Available options:
                            executable command
 ```
 
-Currently, the program only looks in environment variables for configuration.
+Aside from `--service`, the program only looks in environment variables for
+configuration.
 
 - `OTEL_EXPORTER_OTLP_ENDPOINT` (with a default to `localhost:4317`)
 - `OTEL_SERVICE_NAME`
@@ -38,6 +44,18 @@ Currently, the program only looks in environment variables for configuration.
 - and probably others, see
   [`hs-opentelemetry-sdk`](https://hackage.haskell.org/package/hs-opentelemetry-sdk)
   for more information
+
+`--service` is worth reaching for instead of `OTEL_SERVICE_NAME` when the
+command you're tracing is itself instrumented: the environment variable is
+inherited by the command and everything it spawns, so they all report under the
+service name you picked for `hotel`, whereas `--service` only names the span
+that `hotel` itself reports.
+
+```sh
+# The `make build` span is reported under `builds`, while any spans that the
+# build itself reports keep their own service names.
+$ hotel exec --service builds -- make build
+```
 
 Tracing is opt-in: it is enabled when `OTEL_TRACES_EXPORTER` is set (to
 anything other than `none`), or when any `OTEL_EXPORTER_*` environment

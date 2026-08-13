@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 module HotelCalifornia.Tracing
     ( module HotelCalifornia.Tracing
     , defaultSpanArguments
@@ -7,12 +5,23 @@ module HotelCalifornia.Tracing
 
 import Control.Monad
 import Data.Char (toLower)
+import Data.HashMap.Strict qualified as HashMap
 import Data.List (isPrefixOf)
 import Data.Maybe (isJust)
 import Data.Text (Text)
 import HotelCalifornia.Tracing.TraceParent
+import OpenTelemetry.Attributes (getAttributeMap)
 import OpenTelemetry.Context as Context hiding (lookup)
 import OpenTelemetry.Context.ThreadLocal (attachContext)
+import OpenTelemetry.Propagator (setGlobalTextMapPropagator)
+import OpenTelemetry.Resource
+    ( MaterializedResources
+    , getMaterializedResourcesAttributes
+    , getMaterializedResourcesSchema
+    , materializeResourcesWithSchema
+    , mkResource
+    , (.=)
+    )
 import OpenTelemetry.Trace hiding
     ( SpanKind (..)
     , SpanStatus (..)
@@ -33,15 +42,21 @@ import UnliftIO
 --
 --   This also sets up an empty context (creating a new trace ID).
 --
+--   The first argument optionally overrides the service name that spans are
+--   reported under, taking precedence over @OTEL_SERVICE_NAME@. Because it is
+--   applied to the tracer provider's resources rather than to the environment,
+--   it does not affect the service name reported by any subprocess.
+--
 --   The callback receives a 'TracingStatus' describing whether tracing was
 --   actually initialized; see 'tracingEnabled'.
-withGlobalTracing :: (MonadUnliftIO m) => (TracingStatus -> m a) -> m a
-withGlobalTracing act = do
+withGlobalTracing
+    :: (MonadUnliftIO m) => Maybe Text -> (TracingStatus -> m a) -> m a
+withGlobalTracing mServiceName act = do
     void $ attachContext Context.empty
     liftIO setParentSpanFromEnvironment
     enabled <- liftIO otelTracingEnabled
     if enabled
-        then withTracer $ \_ -> act TracingStatus{tracingEnabled = True}
+        then withTracer mServiceName \_ -> act TracingStatus{tracingEnabled = True}
         else act TracingStatus{tracingEnabled = False}
 
 -- | The result of setting up tracing, passed to the callback of
@@ -109,12 +124,60 @@ inSpanWith' spanName args action = do
 inSpan :: (MonadUnliftIO m) => Text -> m a -> m a
 inSpan spanName =
     inSpanWith spanName defaultSpanArguments
-withTracer :: (MonadUnliftIO m) => (TracerProvider -> m a) -> m a
-withTracer =
-    bracket (liftIO initializeGlobalTracerProvider) shutdown
+withTracer :: (MonadUnliftIO m) => Maybe Text -> (TracerProvider -> m a) -> m a
+withTracer mServiceName =
+    bracket
+        (liftIO $ initializeGlobalTracerProviderWithServiceName mServiceName)
+        \tp -> shutdownTracerProvider tp Nothing
+
+-- | Like 'initializeGlobalTracerProvider', but with the service name that
+--   resources are reported with optionally overridden.
+--
+--   Note that the override cannot be applied by setting @OTEL_SERVICE_NAME@:
+--   the SDK spawns subprocesses of its own while detecting resources (@ioreg@
+--   and @sw_vers@ on macOS, for example), and a modified environment would be
+--   inherited by them and by anything else the program runs later.
+--
+--   Note that this reimplements 'initializeGlobalTracerProvider' rather than
+--   delegating to it when there is no override, so that passing @--service@ and
+--   omitting it cannot diverge if the SDK grows an extra initialization step.
+initializeGlobalTracerProviderWithServiceName :: Maybe Text -> IO TracerProvider
+initializeGlobalTracerProviderWithServiceName mServiceName = do
+    (processors, options) <- getTracerProviderInitializationOptions
+    -- Install the propagators that the SDK detected from the environment,
+    -- which 'Trace.initializeTracerProvider' would have done for us if we
+    -- could have used it.
+    setGlobalTextMapPropagator $ tracerProviderOptionsPropagators options
+    tracerProvider <-
+        createTracerProvider processors $
+            options
+                { tracerProviderOptionsResources =
+                    maybe id overrideServiceName mServiceName $
+                        tracerProviderOptionsResources options
+                }
+    setGlobalTracerProvider tracerProvider
+    pure tracerProvider
+
+-- | Replace the @service.name@ attribute of some already-detected resources.
+--
+--   The SDK resolves the service name when the tracer provider is initialized,
+--   and gives @OTEL_SERVICE_NAME@ precedence over any resource passed to
+--   'getTracerProviderInitializationOptions'', so overriding the service name
+--   means editing the resources that it produced.
+overrideServiceName :: Text -> MaterializedResources -> MaterializedResources
+overrideServiceName serviceName resources =
+    -- The schema URL has to be carried over explicitly, since 'mkResource'
+    -- does not preserve it.
+    materializeResourcesWithSchema (getMaterializedResourcesSchema resources) $
+        mkResource $
+            (serviceNameKey .= serviceName)
+                : map Just (HashMap.toList otherAttributes)
   where
-#if MIN_VERSION_hs_opentelemetry_api(1,0,0)
-    shutdown tp = shutdownTracerProvider tp Nothing
-#else
-    shutdown tp = shutdownTracerProvider tp
-#endif
+    otherAttributes =
+        HashMap.delete serviceNameKey $
+            getAttributeMap $
+                getMaterializedResourcesAttributes resources
+
+-- | The resource attribute that the service name is reported as.
+serviceNameKey :: Text
+serviceNameKey = "service.name"

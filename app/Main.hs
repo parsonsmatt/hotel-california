@@ -64,12 +64,14 @@ optionsParser =
 
 main :: IO ()
 main = do
-    withGlobalTracing $ \tracingStatus -> do
-        let
-            parserPrefs = defaultPrefs{prefMultiSuffix = "..."}
-        Command{..} <- customExecParser parserPrefs optionsParser
-        case commandSubCommand of
-            Exec execArgs ->
+    let
+        parserPrefs = defaultPrefs{prefMultiSuffix = "..."}
+    -- Note that the arguments must be parsed before tracing is initialized, so
+    -- that `--service` can take effect.
+    Command{..} <- customExecParser parserPrefs optionsParser
+    case commandSubCommand of
+        Exec execArgs ->
+            withGlobalTracing execArgs.execArgsServiceName \tracingStatus ->
                 if tracingStatus.tracingEnabled
                     then runExecArgs execArgs
                     else runNoTracing $ execArgsSubprocess execArgs

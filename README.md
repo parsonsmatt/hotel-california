@@ -39,6 +39,11 @@ Currently, the program only looks in environment variables for configuration.
   [`hs-opentelemetry-sdk`](https://hackage.haskell.org/package/hs-opentelemetry-sdk)
   for more information
 
+Tracing is opt-in: it is enabled when `OTEL_TRACES_EXPORTER` is set (to
+anything other than `none`), or when any `OTEL_EXPORTER_*` environment
+variable is set with a non-empty value. Setting `OTEL_SDK_DISABLED=true`
+disables tracing regardless of any other configuration.
+
 # Background/FAQ
 
 ## Lol what's up with the name

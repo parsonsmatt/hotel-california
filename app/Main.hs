@@ -2,7 +2,7 @@ module Main where
 
 import Data.Version (showVersion)
 import HotelCalifornia.Exec
-import HotelCalifornia.Tracing (withGlobalTracing)
+import HotelCalifornia.Tracing (TracingStatus (..), withGlobalTracing)
 import Options.Applicative
 import Options.Applicative.Help.Pretty (Doc, vsep)
 import Paths_hotel_california (version)
@@ -64,12 +64,12 @@ optionsParser =
 
 main :: IO ()
 main = do
-    withGlobalTracing $ \mTarget -> do
+    withGlobalTracing $ \tracingStatus -> do
         let
             parserPrefs = defaultPrefs{prefMultiSuffix = "..."}
         Command{..} <- customExecParser parserPrefs optionsParser
         case commandSubCommand of
             Exec execArgs ->
-                case mTarget of
-                    Just _target -> runExecArgs execArgs
-                    Nothing -> runNoTracing $ execArgsSubprocess execArgs
+                if tracingStatus.tracingEnabled
+                    then runExecArgs execArgs
+                    else runNoTracing $ execArgsSubprocess execArgs

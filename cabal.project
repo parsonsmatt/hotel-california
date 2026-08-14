@@ -1,1 +1,4 @@
 packages: .
+allow-newer:
+    -- Ian has been notified.
+    hs-opentelemetry-utils-exceptions:hs-opentelemetry-api

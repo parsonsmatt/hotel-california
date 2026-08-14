@@ -8,6 +8,22 @@ and this project adheres to the
 
 ## Unreleased
 
+- [#23](https://github.com/parsonsmatt/hotel-california/pull/23)
+    - Tracing is now only initialized when an exporter is configured;
+      otherwise tracing is bypassed entirely. Honeycomb is no longer consulted
+      to decide whether tracing is on. Following the [OpenTelemetry
+      environment variable specification](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/):
+        - `OTEL_SDK_DISABLED=true` (case-insensitive) disables tracing.
+        - `OTEL_TRACES_EXPORTER=none` disables tracing; any other non-empty
+          value enables it.
+        - Otherwise, tracing is enabled iff any `OTEL_EXPORTER_*` environment
+          variable is set with a non-empty value.
+        - Environment variables set to the empty string are treated as unset.
+    - Breaking change: the callback to `withGlobalTracing` now receives a
+      `TracingStatus` record (instead of `Maybe HoneycombTarget`), which
+      carries a `tracingEnabled` field. Downstream consumers that want
+      Honeycomb trace links can set those up themselves.
+
 ## 0.0.6.2 - 2026-06-25
 
 - [#25](https://github.com/parsonsmatt/hotel-california/pull/25)

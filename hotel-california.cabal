@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           hotel-california
-version:        0.1.0.0
+version:        0.2.0.0
 description:    Please see the README on GitHub at <https://github.com/parsonsmatt/hotel-california#readme>
 homepage:       https://github.com/parsonsmatt/hotel-california#readme
 bug-reports:    https://github.com/parsonsmatt/hotel-california/issues
@@ -77,7 +77,7 @@ library
     , bytestring
     , directory
     , filepath
-    , hs-opentelemetry-api >=0.3.0.0
+    , hs-opentelemetry-api >=1.0
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
     , hs-opentelemetry-sdk >=0.1.0.1
@@ -142,7 +142,7 @@ executable hotel
     , directory
     , filepath
     , hotel-california
-    , hs-opentelemetry-api >=0.3.0.0
+    , hs-opentelemetry-api >=1.0
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
     , hs-opentelemetry-sdk >=0.1.0.1
@@ -208,7 +208,7 @@ test-suite hotel-california-test
     , directory
     , filepath
     , hotel-california
-    , hs-opentelemetry-api >=0.3.0.0
+    , hs-opentelemetry-api >=1.0
     , hs-opentelemetry-exporter-otlp
     , hs-opentelemetry-propagator-w3c
     , hs-opentelemetry-sdk >=0.1.0.1

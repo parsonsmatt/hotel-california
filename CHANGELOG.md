@@ -6,7 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to the
 [Haskell Package Versioning Policy](https://pvp.haskell.org/).
 
-## Unreleased
+## 0.2.0.0
+
+- [#27](https://github.com/parsonsmatt/hotel-california/pull/27)
+    - Add a `--service SERVICE_NAME` option to `hotel exec`, which sets the
+      service name that the span is reported under. It takes precedence over
+      `OTEL_SERVICE_NAME` and, unlike that environment variable, does not change
+      the service name reported by the command being traced or any of its
+      subprocesses. The name is applied to the tracer provider's resources
+      rather than to the environment, so nothing this process runs can observe
+      it.
+    - Breaking change: `withGlobalTracing` and `withTracer` now take a
+      `Maybe Text` service name override as their first argument.
+    - Breaking change: `hs-opentelemetry-api >= 1.0` is now required. The
+      compatibility shims for older versions have been removed; nothing built
+      against them.
+
+## 0.1.0.0 - 2026-08-14
 
 - [#23](https://github.com/parsonsmatt/hotel-california/pull/23)
     - Tracing is now only initialized when an exporter is configured;
